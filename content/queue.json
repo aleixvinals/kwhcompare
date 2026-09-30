@@ -3,7 +3,9 @@
   "keyword": "how many kwh does a house use per month",
   "title": "How Many kWh Does a House Use per Month?",
   "angle": "Typical monthly kWh by home size and state (use state avg bill / rate from fact pack), what drives usage, how to find yours on the bill, worked example.",
-  "status": "pending"
+  "status": "done",
+  "published": "2026-09-30",
+  "slug": "how-many-kwh-does-a-house-use-per-month"
  },
  {
   "keyword": "electric bill breakdown",
@@ -20,7 +22,7 @@
  {
   "keyword": "how to lower electric bill in winter",
   "title": "How to Lower Your Electric Bill in Winter: 12 Tips",
-  "angle": "Heat pumps and heat strips, thermostat 68\u00b0F DOE guidance, space heater cost math, sealing drafts, water heater, plan choice before winter.",
+  "angle": "Heat pumps and heat strips, thermostat 68°F DOE guidance, space heater cost math, sealing drafts, water heater, plan choice before winter.",
   "status": "pending"
  },
  {
