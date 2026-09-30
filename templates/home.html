@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compare Electricity Rates by State (2026) – Free Bill Analyzer | kWhCompare</title>
+<meta name="description" content="Upload your electric bill or enter your usage to see if you're overpaying. Compare 2026 electricity rates in all 50 states, find cheaper plans in deregulated markets like Texas, Ohio and Pennsylvania, and estimate your savings.">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<link rel="canonical" href="https://kwhcompare.netlify.app/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="kWhCompare">
+<meta property="og:title" content="Am I overpaying for electricity? Compare rates by state (2026)">
+<meta property="og:description" content="Free electric bill analyzer: check your rate against your state average and see cheaper plan options.">
+<meta property="og:url" content="https://kwhcompare.netlify.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#14302b">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<!-- Google AdSense: paste your verification/auto-ads script here once approved, e.g.
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "kWhCompare Electric Bill Analyzer",
+      "url": "https://kwhcompare.netlify.app/",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+      "description": "Free tool that reads your electric bill, compares your rate with your state average and estimates savings from switching plans."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type": "Question", "name": "What is the average electricity rate in the US in 2026?",
+         "acceptedAnswer": {"@type": "Answer", "text": "The average U.S. residential rate is about 18.3 cents per kWh (mid-2026 EIA data), ranging from about 13 cents in Nevada to over 50 cents in Hawaii."}},
+        {"@type": "Question", "name": "Can I choose my electricity provider?",
+         "acceptedAnswer": {"@type": "Answer", "text": "Yes, if you live in a deregulated market such as Texas, Pennsylvania, Ohio, Illinois, New York, New Jersey, Maryland, Massachusetts, Connecticut, Delaware, Maine, New Hampshire, Rhode Island or Washington D.C. Your utility still delivers power; only the supplier changes."}},
+        {"@type": "Question", "name": "What is an ESI ID?",
+         "acceptedAnswer": {"@type": "Answer", "text": "An ESI ID (Electric Service Identifier) is the 17- or 22-digit number that identifies your meter in deregulated Texas. It appears on your bill and tells providers which utility delivers your power."}},
+        {"@type": "Question", "name": "How do I calculate my electricity rate per kWh?",
+         "acceptedAnswer": {"@type": "Answer", "text": "Divide the total amount of your bill by the kWh used in that billing period. For example, $180 for 1,000 kWh is 18 cents per kWh."}},
+        {"@type": "Question", "name": "Is my bill data stored?",
+         "acceptedAnswer": {"@type": "Answer", "text": "No. Numbers you type are calculated in your browser. A bill photo is only sent for reading when you choose to analyze it, and it is not saved."}}
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+:root {
+  --bg: #eef2ef;
+  --surface: #ffffff;
+  --ink: #14302b;
+  --ink-soft: #4a5f5a;
+  --line: #cfd9d4;
+  --meter: #f2c230;
+  --meter-ink: #3a2e00;
+  --save: #16774a;
+  --warn: #b4441c;
+  --field: #f7faf8;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1a18; --surface: #172522; --ink: #e5eeea; --ink-soft: #9fb3ad;
+    --line: #2c3f3a; --meter: #f2c230; --meter-ink: #2a2100; --save: #4cc38a;
+    --warn: #ff8a5c; --field: #1c2d29; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1a18; --surface: #172522; --ink: #e5eeea; --ink-soft: #9fb3ad;
+  --line: #2c3f3a; --meter: #f2c230; --meter-ink: #2a2100; --save: #4cc38a;
+  --warn: #ff8a5c; --field: #1c2d29; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.0625rem; line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+img, svg { max-width: 100%; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--meter); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; }
+
+header.site { border-bottom: 1px solid var(--line); }
+header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: .9rem; }
+.logo { font-weight: 800; font-stretch: 112%; font-size: 1.25rem; text-decoration: none; letter-spacing: -.01em; display: flex; align-items: center; gap: .45rem; }
+.logo-mark { width: 26px; height: 26px; border-radius: 50%; background: var(--meter); display: grid; place-items: center; color: var(--meter-ink); font-size: .8rem; font-weight: 800; }
+nav.top { display: flex; gap: 1.2rem; font-size: .95rem; }
+nav.top a { text-decoration: none; color: var(--ink-soft); }
+nav.top a:hover { color: var(--ink); }
+@media (max-width: 640px) { nav.top { display: none; } }
+
+/* Hero */
+.hero { padding: 2.5rem 0 1.5rem; }
+.hero-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 2.5rem; align-items: start; }
+@media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; gap: 1.5rem; } }
+h1 {
+  font-size: clamp(2.2rem, 5.2vw, 3.6rem); line-height: 1.02; margin: 0 0 1rem;
+  font-weight: 800; font-stretch: 78%; letter-spacing: -.015em;
+}
+.lede { font-size: 1.15rem; color: var(--ink-soft); max-width: 34ch; margin: 0 0 1.5rem; }
+.facts { display: grid; grid-template-columns: repeat(3, auto); gap: 1.25rem; justify-content: start; margin: 0; }
+.facts div { border-left: 3px solid var(--meter); padding-left: .7rem; }
+.facts dt { font-size: .85rem; color: var(--ink-soft); }
+.facts dd { margin: 0; font-weight: 700; font-size: 1.2rem; }
+@media (max-width: 480px) { .facts { grid-template-columns: 1fr 1fr; } }
+
+/* Tool */
+.tool { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.tabs { display: flex; border-bottom: 1px solid var(--line); }
+.tabs button {
+  flex: 1; font: inherit; font-weight: 600; font-size: .95rem; padding: .9rem .5rem; border: 0;
+  background: transparent; color: var(--ink-soft); cursor: pointer; border-bottom: 3px solid transparent;
+}
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--meter); }
+.panel { padding: 1.25rem; }
+.panel[hidden] { display: none; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+@media (max-width: 480px) { .grid2 { grid-template-columns: 1fr; } }
+label { display: block; font-size: .9rem; font-weight: 600; margin-bottom: .3rem; }
+.hint { font-weight: 400; color: var(--ink-soft); font-size: .82rem; }
+input, select, textarea {
+  width: 100%; font: inherit; font-size: 1rem; color: var(--ink); background: var(--field);
+  border: 1px solid var(--line); border-radius: 8px; padding: .65rem .7rem;
+}
+textarea { min-height: 110px; resize: vertical; }
+.field { margin-bottom: .9rem; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  font: inherit; font-weight: 700; font-size: 1rem; padding: .8rem 1.2rem; border-radius: 8px;
+  border: 0; cursor: pointer; background: var(--ink); color: var(--bg); width: 100%;
+}
+.btn.meter { background: var(--meter); color: var(--meter-ink); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); width: auto; }
+.btn:disabled { opacity: .55; cursor: progress; }
+.drop {
+  border: 2px dashed var(--line); border-radius: 10px; padding: 1.4rem 1rem; text-align: center;
+  cursor: pointer; margin-bottom: .9rem; background: var(--field);
+}
+.drop.over { border-color: var(--meter); }
+.drop strong { display: block; margin-bottom: .2rem; }
+.status { font-size: .9rem; color: var(--ink-soft); margin: .6rem 0 0; min-height: 1.2em; }
+.status.err { color: var(--warn); }
+.esi-note { font-size: .85rem; margin-top: .35rem; color: var(--save); min-height: 1.1em; }
+.or { text-align: center; font-size: .85rem; color: var(--ink-soft); margin: .6rem 0; }
+
+/* Results */
+#results { border-top: 1px solid var(--line); padding: 1.25rem; }
+#results[hidden] { display: none; }
+.verdict { font-size: 1.35rem; font-weight: 700; line-height: 1.2; margin: 0 0 .3rem; font-stretch: 90%; }
+.verdict.good { color: var(--save); }
+.verdict.bad { color: var(--warn); }
+.sub { color: var(--ink-soft); margin: 0 0 1rem; font-size: .95rem; }
+.gauge { position: relative; height: 54px; margin: .5rem 0 1.4rem; }
+.gauge-track { position: absolute; left: 0; right: 0; top: 18px; height: 12px; border-radius: 6px;
+  background: linear-gradient(90deg, #2e9a63 0%, #9cc34a 35%, #f2c230 60%, #e0772f 80%, #c2371c 100%); }
+.pin { position: absolute; top: 0; transform: translateX(-50%); text-align: center; font-size: .75rem; white-space: nowrap; }
+.pin::after { content: ""; display: block; width: 2px; height: 30px; margin: 0 auto; background: var(--ink); }
+.pin.you { top: auto; bottom: 0; display: flex; flex-direction: column-reverse; }
+.pin.you::after { height: 34px; width: 4px; border-radius: 2px; }
+.pin b { font-weight: 700; }
+.options { display: grid; gap: .7rem; }
+.opt { border: 1px solid var(--line); border-radius: 10px; padding: .9rem 1rem; display: grid; grid-template-columns: 1fr auto; gap: .25rem 1rem; align-items: center; }
+.opt h3 { margin: 0; font-size: 1rem; }
+.opt p { margin: 0; font-size: .88rem; color: var(--ink-soft); grid-column: 1; }
+.opt .amt { grid-row: 1 / span 2; grid-column: 2; text-align: right; }
+.opt .amt strong { display: block; font-size: 1.15rem; }
+.opt .amt span { font-size: .8rem; color: var(--save); font-weight: 600; }
+.opt a.go { grid-column: 1 / -1; font-size: .88rem; font-weight: 700; margin-top: .3rem; }
+.disclaimer { font-size: .8rem; color: var(--ink-soft); margin: 1rem 0 0; }
+
+/* Ads */
+.ad-slot {
+  margin: 2rem auto; min-height: 100px; border: 1px dashed var(--line); border-radius: 8px;
+  display: grid; place-items: center; color: var(--ink-soft); font-size: .8rem; max-width: 970px;
+}
+
+/* Content sections */
+section.content { padding: 2.5rem 0; border-top: 1px solid var(--line); }
+h2 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); font-weight: 800; font-stretch: 82%; line-height: 1.1; margin: 0 0 .8rem; letter-spacing: -.01em; }
+.prose { max-width: 70ch; }
+.prose p { margin: 0 0 1rem; }
+.table-tools { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; margin: 1rem 0; }
+.table-tools input { max-width: 260px; }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+th, td { text-align: left; padding: .6rem .9rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: .85rem; color: var(--ink-soft); font-weight: 600; background: var(--field); position: sticky; top: 0; }
+th button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+td.num, th.num { text-align: right; }
+tr:last-child td { border-bottom: 0; }
+.bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--meter); vertical-align: middle; margin-right: .5rem; }
+.tag { font-size: .75rem; font-weight: 600; padding: .1rem .45rem; border-radius: 4px; background: var(--field); border: 1px solid var(--line); }
+.tag.choice { background: var(--meter); color: var(--meter-ink); border-color: transparent; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; padding: 0; list-style: none; counter-reset: s; margin: 1.2rem 0 0; }
+.steps li { counter-increment: s; }
+.steps li::before { content: counter(s); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--bg); font-weight: 800; margin-bottom: .6rem; }
+.steps h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.steps p { margin: 0; color: var(--ink-soft); font-size: .95rem; }
+@media (max-width: 720px) { .steps { grid-template-columns: 1fr; } }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+@media (max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+.bill-anatomy { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.2rem; }
+.bill-anatomy dl { margin: 0; }
+.bill-anatomy dt { font-weight: 700; margin-top: .7rem; }
+.bill-anatomy dt:first-child { margin-top: 0; }
+.bill-anatomy dd { margin: .15rem 0 0; color: var(--ink-soft); font-size: .95rem; }
+details { border-bottom: 1px solid var(--line); padding: .9rem 0; max-width: 75ch; }
+summary { font-weight: 700; cursor: pointer; font-size: 1.05rem; }
+details p { margin: .6rem 0 0; color: var(--ink-soft); }
+footer { border-top: 1px solid var(--line); padding: 2rem 0 3rem; font-size: .88rem; color: var(--ink-soft); }
+footer .cols { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; }
+footer a { color: var(--ink-soft); }
+@media (prefers-reduced-motion: no-preference) {
+  .pin { transition: left .6s cubic-bezier(.2,.8,.2,1); }
+}
+
+.crumbs{font-size:.85rem;color:var(--ink-soft);padding-top:1rem}
+.crumbs a{color:var(--ink-soft)}
+.state-links{display:flex;flex-wrap:wrap;gap:.5rem;padding:0;list-style:none}
+.state-links a{display:inline-block;padding:.35rem .7rem;border:1px solid var(--line);border-radius:6px;text-decoration:none;font-size:.92rem;background:var(--surface)}
+.state-links a:hover{border-color:var(--meter)}
+.statbox{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:1.2rem 0}
+.statbox div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem}
+.statbox dt{font-size:.82rem;color:var(--ink-soft)}.statbox dd{margin:0;font-weight:700;font-size:1.3rem}
+@media(max-width:640px){.statbox{grid-template-columns:1fr 1fr}}
+.prose ul{padding-left:1.2rem}.prose li{margin-bottom:.35rem}
+td a{font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="kWhCompare home"><span class="logo-mark" aria-hidden="true">⚡</span>kWhCompare</a>
+    <nav class="top" aria-label="Main">
+      <a href="#rates">Rates by state</a>
+      <a href="#choice">Choose a provider</a>
+      <a href="#read-bill">Read your bill</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Are you overpaying for electricity?</h1>
+      <p class="lede">Upload a photo of your electric bill or type in two numbers. We compare your rate with your state's average and show cheaper ways to pay for the same power.</p>
+      <dl class="facts">
+        <div><dt>U.S. average</dt><dd>18.34¢/kWh</dd></div>
+        <div><dt>Cheapest state</dt><dd>Nevada 13.1¢</dd></div>
+        <div><dt>Priciest state</dt><dd>Hawaii 52.7¢</dd></div>
+      </dl>
+    </div>
+
+    <div class="tool" id="compare">
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-manual" aria-selected="true" aria-controls="p-manual">Enter my numbers</button>
+        <button role="tab" id="tab-bill" aria-selected="false" aria-controls="p-bill">Upload my bill</button>
+      </div>
+
+      <div class="panel" id="p-manual" role="tabpanel" aria-labelledby="tab-manual">
+        <div class="field">
+          <label for="state">Your state</label>
+          <select id="state" required></select>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="kwh">kWh used last month <span class="hint">(on your bill)</span></label>
+            <input id="kwh" type="number" inputmode="numeric" min="1" placeholder="e.g. 1000">
+          </div>
+          <div class="field">
+            <label for="total">Total bill amount <span class="hint">($)</span></label>
+            <input id="total" type="number" inputmode="decimal" min="0" step="0.01" placeholder="e.g. 182.40">
+          </div>
+        </div>
+        <div class="field">
+          <label for="esi">ESI ID or account number <span class="hint">(optional, Texas: 17 or 22 digits)</span></label>
+          <input id="esi" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 10089010000000000">
+          <div class="esi-note" id="esi-note" aria-live="polite"></div>
+        </div>
+        <button class="btn meter" id="run">Compare my rate</button>
+      </div>
+
+      <div class="panel" id="p-bill" role="tabpanel" aria-labelledby="tab-bill" hidden>
+        <div id="photo-area">
+          <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a photo or screenshot of your bill">
+            <strong>Drop a photo or screenshot of your bill</strong>
+            <span class="hint">or tap to choose one. JPG, PNG or WEBP.</span>
+          </div>
+          <input type="file" id="file" accept="image/*" hidden>
+          <p class="or">or</p>
+        </div>
+        <div class="field">
+          <label for="billtext">Paste the text of your bill</label>
+          <textarea id="billtext" placeholder="Copy the text from your PDF bill and paste it here. We look for kWh used, amount due and your ESI ID."></textarea>
+        </div>
+        <button class="btn" id="read">Read my bill</button>
+        <p class="status" id="bill-status" aria-live="polite"></p>
+      </div>
+
+      <div id="results" hidden aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="ad-slot" aria-label="Advertisement">
+  <!-- AdSense display unit #1 (leaderboard / responsive) -->
+  Advertisement
+</div></div>
+
+<section class="content" id="rates">
+  <div class="wrap">
+    <h2>Electricity rates by state (2026)</h2>
+    <div class="prose">
+      <p>Average residential rates in cents per kilowatt-hour, all charges included, from U.S. Energy Information Administration data for mid-2026. States marked <span class="tag choice">Choice</span> let you pick your electricity supplier, which is where most of the savings are.</p>
+    </div>
+    <div class="table-tools">
+      <label for="filter" class="hint" style="margin:0">Find a state</label>
+      <input id="filter" type="search" placeholder="Type a state name">
+    </div>
+    <div class="scroll">
+      <table id="rate-table">
+        <thead><tr>
+          <th><button data-sort="name">State</button></th>
+          <th class="num"><button data-sort="rate">Rate ¢/kWh</button></th>
+          <th class="num"><button data-sort="bill">Avg bill/mo</button></th>
+          <th class="num"><button data-sort="yoy">1-yr change</button></th>
+          <th>Market</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="disclaimer">Averages are revenue divided by kWh sold, so your actual rate depends on your utility, plan and season. Updated September 2026.</p>
+  </div>
+</section>
+
+<section class="content" id="states"><div class="wrap"><h2>Electricity rates in your state</h2><ul class="state-links"><li><a href="/electricity-rates/alabama/">Alabama</a></li> <li><a href="/electricity-rates/alaska/">Alaska</a></li> <li><a href="/electricity-rates/arizona/">Arizona</a></li> <li><a href="/electricity-rates/arkansas/">Arkansas</a></li> <li><a href="/electricity-rates/california/">California</a></li> <li><a href="/electricity-rates/colorado/">Colorado</a></li> <li><a href="/electricity-rates/connecticut/">Connecticut</a></li> <li><a href="/electricity-rates/delaware/">Delaware</a></li> <li><a href="/electricity-rates/district-of-columbia/">District of Columbia</a></li> <li><a href="/electricity-rates/florida/">Florida</a></li> <li><a href="/electricity-rates/georgia/">Georgia</a></li> <li><a href="/electricity-rates/hawaii/">Hawaii</a></li> <li><a href="/electricity-rates/idaho/">Idaho</a></li> <li><a href="/electricity-rates/illinois/">Illinois</a></li> <li><a href="/electricity-rates/indiana/">Indiana</a></li> <li><a href="/electricity-rates/iowa/">Iowa</a></li> <li><a href="/electricity-rates/kansas/">Kansas</a></li> <li><a href="/electricity-rates/kentucky/">Kentucky</a></li> <li><a href="/electricity-rates/louisiana/">Louisiana</a></li> <li><a href="/electricity-rates/maine/">Maine</a></li> <li><a href="/electricity-rates/maryland/">Maryland</a></li> <li><a href="/electricity-rates/massachusetts/">Massachusetts</a></li> <li><a href="/electricity-rates/michigan/">Michigan</a></li> <li><a href="/electricity-rates/minnesota/">Minnesota</a></li> <li><a href="/electricity-rates/mississippi/">Mississippi</a></li> <li><a href="/electricity-rates/missouri/">Missouri</a></li> <li><a href="/electricity-rates/montana/">Montana</a></li> <li><a href="/electricity-rates/nebraska/">Nebraska</a></li> <li><a href="/electricity-rates/nevada/">Nevada</a></li> <li><a href="/electricity-rates/new-hampshire/">New Hampshire</a></li> <li><a href="/electricity-rates/new-jersey/">New Jersey</a></li> <li><a href="/electricity-rates/new-mexico/">New Mexico</a></li> <li><a href="/electricity-rates/new-york/">New York</a></li> <li><a href="/electricity-rates/north-carolina/">North Carolina</a></li> <li><a href="/electricity-rates/north-dakota/">North Dakota</a></li> <li><a href="/electricity-rates/ohio/">Ohio</a></li> <li><a href="/electricity-rates/oklahoma/">Oklahoma</a></li> <li><a href="/electricity-rates/oregon/">Oregon</a></li> <li><a href="/electricity-rates/pennsylvania/">Pennsylvania</a></li> <li><a href="/electricity-rates/rhode-island/">Rhode Island</a></li> <li><a href="/electricity-rates/south-carolina/">South Carolina</a></li> <li><a href="/electricity-rates/south-dakota/">South Dakota</a></li> <li><a href="/electricity-rates/tennessee/">Tennessee</a></li> <li><a href="/electricity-rates/texas/">Texas</a></li> <li><a href="/electricity-rates/utah/">Utah</a></li> <li><a href="/electricity-rates/vermont/">Vermont</a></li> <li><a href="/electricity-rates/virginia/">Virginia</a></li> <li><a href="/electricity-rates/washington/">Washington</a></li> <li><a href="/electricity-rates/west-virginia/">West Virginia</a></li> <li><a href="/electricity-rates/wisconsin/">Wisconsin</a></li> <li><a href="/electricity-rates/wyoming/">Wyoming</a></li></ul></div></section>
+<section class="content" id="how">
+  <div class="wrap">
+    <h2>How the comparison works</h2>
+    <ol class="steps">
+      <li><h3>We read your bill</h3><p>Your kWh, total amount due, utility and ESI ID or account number are pulled from the bill or the numbers you enter.</p></li>
+      <li><h3>We find your real rate</h3><p>Total ÷ kWh gives your all-in price per kWh, which we place against your state's average.</p></li>
+      <li><h3>We show cheaper options</h3><p>In deregulated states that means competitive supply plans. Elsewhere it means time-of-use rates, community solar and efficiency.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="content" id="choice">
+  <div class="wrap two-col">
+    <div class="prose">
+      <h2>Can you choose your electricity provider?</h2>
+      <p>In about a third of the country, yes. In deregulated markets your local utility still owns the poles and wires and still answers outage calls, but a retail provider sells you the electricity itself. That supply charge is usually more than half your bill, and it's the part you can shop.</p>
+      <p><strong>Full retail choice:</strong> Texas, Pennsylvania, Ohio, Illinois, New York, New Jersey, Maryland, Massachusetts, Connecticut, Delaware, Maine, New Hampshire, Rhode Island and Washington D.C.</p>
+      <p><strong>Limited choice:</strong> Michigan, Virginia, California, Oregon and Nevada allow switching only for some customers or through capped programs.</p>
+      <p>If you've never switched, you're probably on your utility's default "price to compare" or standard offer. Competitive fixed-rate plans often beat it, but always check the contract length, early cancellation fee and whether the rate is fixed or variable.</p>
+    </div>
+    <div class="prose" id="regulated">
+      <h2>What if your state is regulated?</h2>
+      <p>You can't change supplier, but you can still lower the bill:</p>
+      <p><strong>Time-of-use rates.</strong> Most large utilities now offer cheaper overnight and weekend pricing. Running the dishwasher, laundry and EV charging off-peak can cut 5–15%.</p>
+      <p><strong>Community solar.</strong> Subscribe to a local solar farm and get bill credits worth more than you pay, usually 5–15% savings with no panels on your roof.</p>
+      <p><strong>Efficiency.</strong> A smart thermostat, LED bulbs and sealing drafts are the cheapest kilowatt-hours you'll ever buy.</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="ad-slot" aria-label="Advertisement">
+  <!-- AdSense in-article unit #2 -->
+  Advertisement
+</div></div>
+
+<section class="content" id="read-bill">
+  <div class="wrap two-col">
+    <div class="prose">
+      <h2>How to read your electric bill</h2>
+      <p>Every U.S. utility formats its bill differently, but the numbers that matter for comparing plans are always there. Find these four and you can compare any offer in under a minute.</p>
+      <p>Your real rate is the <strong>total amount due divided by kWh used</strong>. Advertised plan rates often exclude delivery charges, so compare all-in numbers whenever you can.</p>
+    </div>
+    <div class="bill-anatomy">
+      <dl>
+        <dt>kWh used</dt>
+        <dd>Usually shown as "Energy used" or "Usage" with a meter read for this and last period.</dd>
+        <dt>Supply or generation charge</dt>
+        <dd>The electricity itself. In choice states this is the part a new provider replaces.</dd>
+        <dt>Delivery or TDU charge</dt>
+        <dd>What the utility charges to move power to your home. It stays the same whoever your supplier is.</dd>
+        <dt>ESI ID (Texas) or account / POD number</dt>
+        <dd>The ID of your meter. Providers need it to switch you; in Texas the first digits show which utility serves you.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="content" id="faq">
+  <div class="wrap">
+    <h2>Frequently asked questions</h2>
+    <details><summary>What is the average electricity rate in the US in 2026?</summary><p>About 18.3 cents per kWh for homes as of mid-2026, up roughly 5% from a year earlier. Nevada, Nebraska and Utah are the cheapest; Hawaii, California and much of New England are the most expensive.</p></details>
+    <details><summary>Is it worth switching electricity providers?</summary><p>In deregulated states, households on the default utility rate often save 10–20% on the supply portion by moving to a competitive fixed-rate plan. Watch for teaser rates, monthly fees and cancellation fees.</p></details>
+    <details><summary>What is an ESI ID and where do I find it?</summary><p>The Electric Service Identifier is a 17- or 22-digit number unique to your meter in deregulated Texas. It's printed on your bill near your service address. The first digits identify your utility, such as CenterPoint or Oncor.</p></details>
+    <details><summary>How do I calculate my cost per kWh?</summary><p>Divide your total bill by the kWh you used. $182 ÷ 1,000 kWh = 18.2¢ per kWh. This all-in figure is the fairest way to compare plans.</p></details>
+    <details><summary>Will switching cause a power outage?</summary><p>No. Your utility keeps delivering power over the same lines. Only the company that bills you for supply changes.</p></details>
+    <details><summary>Do you store my bill?</summary><p>No. Numbers you type are calculated in your browser. A bill photo is only sent for reading when you press "Read my bill," and it isn't saved.</p></details>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap cols">
+    <div><strong class="logo" style="font-size:1rem">kWhCompare</strong><p style="max-width:44ch">Independent electricity rate comparisons for U.S. households. Estimates are for guidance only and aren't offers from any provider.</p></div>
+    <div><p><a href="/#rates">Rates by state</a><br><a href="/electricity-rates/texas/">Texas rates</a><br><a href="/electricity-rates/pennsylvania/">Pennsylvania rates</a><br><a href="/electricity-rates/ohio/">Ohio rates</a></p></div>
+    <div><p><a href="/about/">About</a><br><a href="/privacy/">Privacy policy</a><br><a href="/terms/">Terms of use</a><br><a href="/contact/">Contact</a></p></div>
+  </div>
+  <div class="wrap"><p>© 2026 kWhCompare. Rate data: U.S. Energy Information Administration.</p></div>
+</footer>
+
+<script>const STATES = [
+ ["AL","Alabama",16.40,182,2.1],["AK","Alaska",28.21,160,5.0],["AZ","Arizona",15.18,151,-0.3],["AR","Arkansas",14.12,150,5.6],
+ ["CA","California",34.74,190,3.4],["CO","Colorado",17.13,121,6.8],["CT","Connecticut",24.32,170,-10.6],["DE","Delaware",19.29,171,6.2],
+ ["DC","District of Columbia",24.39,168,7.4],["FL","Florida",15.10,165,-1.6],["GA","Georgia",16.36,171,2.5],["HI","Hawaii",52.72,268,28.7],
+ ["ID","Idaho",14.37,136,19.1],["IL","Illinois",19.89,138,8.7],["IN","Indiana",17.51,162,6.3],["IA","Iowa",15.93,149,3.9],
+ ["KS","Kansas",15.71,148,4.5],["KY","Kentucky",14.26,152,6.4],["LA","Louisiana",13.49,157,5.9],["ME","Maine",29.59,169,5.2],
+ ["MD","Maryland",21.84,168,13.2],["MA","Massachusetts",29.61,172,-2.4],["MI","Michigan",22.99,160,10.4],["MN","Minnesota",17.52,140,2.3],
+ ["MS","Mississippi",14.88,167,5.8],["MO","Missouri",16.22,172,1.9],["MT","Montana",15.14,126,2.2],["NE","Nebraska",13.25,131,0.8],
+ ["NV","Nevada",13.11,120,6.9],["NH","New Hampshire",27.01,172,14.9],["NJ","New Jersey",24.95,167,0.3],["NM","New Mexico",15.06,108,2.6],
+ ["NY","New York",29.49,174,11.1],["NC","North Carolina",14.74,145,10.2],["ND","North Dakota",14.12,150,3.0],["OH","Ohio",19.19,159,9.7],
+ ["OK","Oklahoma",14.33,144,5.1],["OR","Oregon",16.32,128,3.3],["PA","Pennsylvania",21.73,165,10.4],["RI","Rhode Island",29.23,167,8.9],
+ ["SC","South Carolina",15.55,167,5.1],["SD","South Dakota",15.36,149,8.0],["TN","Tennessee",14.07,158,1.8],["TX","Texas",15.94,173,4.5],
+ ["UT","Utah",13.37,96,2.1],["VT","Vermont",24.44,136,6.3],["VA","Virginia",17.22,162,13.1],["WA","Washington",14.91,132,15.0],
+ ["WV","West Virginia",15.45,148,-2.3],["WI","Wisconsin",19.56,143,5.6],["WY","Wyoming",15.24,128,2.4]
+].map(([code,name,rate,bill,yoy]) => ({code,name,rate,bill,yoy}));
+const US_AVG = 18.34;
+const CHOICE = new Set(["TX","PA","OH","IL","NY","NJ","MD","MA","CT","DE","ME","NH","RI","DC"]);
+const LIMITED = new Set(["MI","VA","CA","OR","NV"]);
+const COMMUNITY_SOLAR = new Set(["NY","NJ","MA","MD","IL","MN","CO","ME","NM","VA","DE","CT","RI","OR","CA","HI","WA","DC"]);
+const ESI_PREFIX = [
+  ["1008901","CenterPoint Energy (Houston area)"],
+  ["10443720","Oncor (Dallas–Fort Worth area)"],
+  ["1017699","Oncor (Dallas–Fort Worth area)"],
+  ["10032789","AEP Texas Central"],
+  ["10204049","AEP Texas North"],
+  ["10400511","Texas-New Mexico Power (TNMP)"]
+];
+const slug = n => n.toLowerCase().replace(/[^a-z]+/g,"-");
+const $ = id => document.getElementById(id);
+const byCode = Object.fromEntries(STATES.map(s => [s.code, s]));
+const fmt$ = n => "$" + n.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const fmtC = n => n.toFixed(1) + "¢";
+
+/* ---------- State select + remembered inputs ---------- */
+const sel = $("state");
+sel.innerHTML = '<option value="">Select your state</option>' + STATES.map(s => `<option value="${s.code}">${s.name}</option>`).join("");
+try {
+  const saved = JSON.parse(localStorage.getItem("kwhc-last") || "null");
+  if (saved && !document.body.dataset.state) { sel.value = saved.state || ""; $("kwh").value = saved.kwh || ""; $("total").value = saved.total || ""; }
+} catch (e) {}
+
+if (document.body.dataset.state) sel.value = document.body.dataset.state;
+
+/* ---------- Tabs ---------- */
+const tabs = [["tab-manual","p-manual"],["tab-bill","p-bill"]];
+function showTab(id) {
+  tabs.forEach(([t,p]) => { const on = t === id; $(t).setAttribute("aria-selected", on); $(p).hidden = !on; });
+}
+tabs.forEach(([t]) => $(t).addEventListener("click", () => showTab(t)));
+
+/* ---------- ESI ID detection ---------- */
+function detectEsi(raw) {
+  const d = (raw || "").replace(/\D/g, "");
+  if (!d) return null;
+  if (d.length !== 17 && d.length !== 22) return {valid:false, digits:d};
+  const hit = ESI_PREFIX.find(([p]) => d.startsWith(p));
+  return {valid:true, digits:d, tdu: hit ? hit[1] : null};
+}
+$("esi").addEventListener("input", e => {
+  const r = detectEsi(e.target.value), note = $("esi-note");
+  if (!r) { note.textContent = ""; return; }
+  if (!r.valid) { note.textContent = r.digits.length > 5 ? "Texas ESI IDs have 17 or 22 digits. Account numbers from other states are fine too." : ""; return; }
+  note.textContent = r.tdu ? `Texas ESI ID detected: served by ${r.tdu}.` : "Texas ESI ID detected.";
+  if (!sel.value) sel.value = "TX";
+});
+
+/* ---------- Comparison engine ---------- */
+function compare({state, kwh, total}) {
+  const s = byCode[state];
+  const rate = total / kwh * 100; // cents per kWh, all-in
+  const diff = (rate - s.rate) / s.rate;
+  const opts = [];
+  const cost = r => r / 100 * kwh;
+
+  if (CHOICE.has(state)) {
+    // Supply is ~55–60% of an all-in bill; competitive fixed plans typically undercut default supply by 10–20%.
+    const fixed = Math.min(rate * (1 - 0.58 * 0.15), s.rate * 0.95);
+    opts.push({t:"12-month fixed-rate plan", d:"Locks your supply price for a year. Compare cancellation fees before you sign.", r:fixed, cta:"See fixed-rate plans"});
+    opts.push({t:"100% renewable fixed plan", d:"Same price protection, backed by renewable energy certificates.", r:fixed * 1.04, cta:"See green plans"});
+    opts.push({t:"Free nights / time-of-use plan", d:"Best if you can move about a third of your use (laundry, EV charging) to off-peak hours.", r:fixed * 0.94, cta:"See time-of-use plans"});
+  } else {
+    opts.push({t:"Your utility's time-of-use rate", d:"Cheaper off-peak pricing. Savings assume you shift about a third of your usage.", r:rate * 0.92, cta:"Check your utility's rate options"});
+    if (COMMUNITY_SOLAR.has(state)) opts.push({t:"Community solar subscription", d:"Bill credits from a local solar farm, no panels or upfront cost.", r:rate * 0.9, cta:"Find community solar near you"});
+    opts.push({t:"Efficiency upgrades", d:"Smart thermostat, LED lighting and draft sealing typically trim 5–10% of usage.", r:rate * 0.93, cta:"See efficiency tips"});
+  }
+  opts.forEach(o => { o.cost = cost(o.r); o.save = Math.max(0, total - o.cost); });
+  opts.sort((a,b) => a.cost - b.cost);
+  return {s, rate, diff, opts};
+}
+
+function pinPos(v, lo, hi) { return Math.max(3, Math.min(97, (v - lo) / (hi - lo) * 100)); }
+
+function render(input) {
+  const {s, rate, diff, opts} = compare(input);
+  const out = $("results");
+  const pct = Math.round(Math.abs(diff) * 100);
+  let cls = "good", head;
+  if (diff > 0.05) { cls = "bad"; head = `You pay ${pct}% more than the ${s.name} average.`; }
+  else if (diff < -0.05) head = `You pay ${pct}% less than the ${s.name} average.`;
+  else { cls = ""; head = `You pay about the ${s.name} average.`; }
+  const best = opts[0];
+  const yearly = best.save * 12;
+  const lo = Math.min(rate, s.rate, US_AVG) * 0.7, hi = Math.max(rate, s.rate, US_AVG) * 1.25;
+  const market = CHOICE.has(s.code) ? `${s.name} lets you choose your supplier, so switching plans is your biggest lever.`
+    : LIMITED.has(s.code) ? `${s.name} has limited retail choice, so most savings come from rate options and solar.`
+    : `${s.name} is regulated, so you keep your utility but can still change how you pay.`;
+
+  out.innerHTML = `
+    <p class="verdict ${cls}">${head}</p>
+    <p class="sub">Your all-in rate is <b>${fmtC(rate)}/kWh</b> vs ${fmtC(s.rate)} in ${s.name} and ${fmtC(US_AVG)} nationally. ${market}</p>
+    <div class="gauge" role="img" aria-label="Your rate ${fmtC(rate)} compared with state average ${fmtC(s.rate)} and U.S. average ${fmtC(US_AVG)}">
+      <div class="gauge-track"></div>
+      <div class="pin" style="left:${pinPos(s.rate,lo,hi)}%"><b>${s.code}</b> ${fmtC(s.rate)}</div>
+      <div class="pin you" style="left:${pinPos(rate,lo,hi)}%"><b>You ${fmtC(rate)}</b></div>
+    </div>
+    ${yearly > 5 ? `<p class="sub" style="color:var(--ink)">Best option below could save about <b>${fmt$(yearly)}/year</b>.</p>` : ""}
+    <div class="options">
+      ${opts.map(o => `
+        <div class="opt">
+          <h3>${o.t}</h3>
+          <p>${o.d}</p>
+          <div class="amt"><strong>${fmt$(o.cost)}/mo</strong><span>${o.save > 0.5 ? "save " + fmt$(o.save) : "similar cost"}</span></div>
+          <a class="go" href="#" data-partner="${s.code}-${o.t.toLowerCase().replace(/[^a-z]+/g,'-')}">${o.cta}</a>
+        </div>`).join("")}
+    </div>
+    <p class="disclaimer">Estimates based on ${Math.round(input.kwh).toLocaleString()} kWh and ${fmt$(input.total)}. Actual prices depend on your utility zone, plan terms and taxes.</p>`;
+  out.hidden = false;
+  out.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "nearest"});
+}
+
+$("run").addEventListener("click", () => {
+  const state = sel.value, kwh = parseFloat($("kwh").value), total = parseFloat($("total").value);
+  const missing = !state ? sel : !(kwh > 0) ? $("kwh") : !(total > 0) ? $("total") : null;
+  if (missing) { missing.focus(); missing.reportValidity?.(); $("results").hidden = false; $("results").innerHTML = `<p class="status err">Add your ${missing === sel ? "state" : missing.id === "kwh" ? "kWh used" : "total bill amount"} to compare.</p>`; return; }
+  try { localStorage.setItem("kwhc-last", JSON.stringify({state, kwh, total})); } catch (e) {}
+  render({state, kwh, total});
+});
+
+/* ---------- Bill reading ---------- */
+function parseBillText(txt) {
+  const t = txt.replace(/,/g, "");
+  const out = {};
+  const k = t.match(/(\d{2,5}(?:\.\d+)?)\s*kwh/i) || t.match(/kwh[^\d]{0,30}(\d{2,5}(?:\.\d+)?)/i);
+  if (k) out.kwh = parseFloat(k[1]);
+  const a = t.match(/(?:total (?:amount )?due|amount due|total due|total charges|balance due|please pay)[^\d$]{0,30}\$?\s*(\d+\.\d{2})/i);
+  if (a) out.total = parseFloat(a[1]);
+  const esi = t.match(/\b(\d{17}(?:\d{5})?)\b/);
+  if (esi) out.esi = esi[1];
+  const st = STATES.find(s => new RegExp("\\b" + s.name + "\\b", "i").test(t)) ||
+             STATES.find(s => new RegExp(",\\s*" + s.code + "\\s+\\d{5}").test(t));
+  if (st) out.state = st.code;
+  return out;
+}
+
+function applyBill(d, source) {
+  const st = $("bill-status");
+  if (d.state && byCode[d.state]) sel.value = d.state;
+  if (d.kwh) $("kwh").value = d.kwh;
+  if (d.total) $("total").value = d.total;
+  if (d.esi) { $("esi").value = d.esi; $("esi").dispatchEvent(new Event("input")); }
+  const found = [d.kwh && "kWh used", d.total && "amount due", d.state && "state", d.esi && "ESI ID", d.utility && "utility"].filter(Boolean);
+  if (d.kwh && d.total && sel.value) {
+    st.className = "status"; st.textContent = `Read ${found.join(", ")} from your ${source}${d.utility ? " (" + d.utility + ")" : ""}.`;
+    render({state: sel.value, kwh: d.kwh, total: d.total});
+  } else {
+    st.className = "status err";
+    st.textContent = found.length ? `Found ${found.join(", ")}. Add the rest in "Enter my numbers" to finish.` : "Couldn't find kWh or amount due. Enter them in \"Enter my numbers\".";
+    if (found.length) setTimeout(() => showTab("tab-manual"), 1400);
+  }
+}
+
+let photo = null, sample = null;
+const drop = $("drop"), fileIn = $("file");
+drop.addEventListener("click", () => fileIn.click());
+drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileIn.click(); } });
+["dragover","dragenter"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => { if (e.dataTransfer.files[0]) setPhoto(e.dataTransfer.files[0]); });
+fileIn.addEventListener("change", () => { if (fileIn.files[0]) setPhoto(fileIn.files[0]); });
+function setPhoto(f) {
+  photo = f;
+  drop.querySelector("strong").textContent = f.name;
+  drop.querySelector(".hint").textContent = "Ready. Press \"Read my bill\".";
+}
+
+// Photo reading needs an AI backend. Inside Claude it uses the viewer's Claude; on your own site, swap in your API endpoint.
+(async () => {
+  $("photo-area").hidden = true;
+  try {
+    if (!window.claude?.use) return;
+    sample = await window.claude.use("sample");
+    if (!sample) return;
+    const lim = await sample.limits().catch(() => null);
+    if (lim?.images) { fileIn.accept = lim.images.mediaTypes.join(","); $("photo-area").hidden = false; }
+  } catch (e) {}
+})();
+
+$("read").addEventListener("click", async () => {
+  const st = $("bill-status"), btn = $("read");
+  const txt = $("billtext").value.trim();
+  if (!photo && !txt) { st.className = "status err"; st.textContent = "Add a bill photo or paste the bill text first."; return; }
+
+  if (photo && sample) {
+    btn.disabled = true; st.className = "status"; st.textContent = "Reading your bill…";
+    try {
+      const d = await sample.json(
+        `The image is a U.S. residential electric bill. Extract these fields and reply with only one JSON object, no prose:
+{"utility": string|null, "state": two-letter US state code|null, "kwh": number|null (energy used this billing period), "total": number|null (total amount due in USD), "supply_rate_cents": number|null, "esi": string|null (Texas ESI ID digits or account number)}
+Use null for anything not visible. Numbers without units or commas.`,
+        {images: photo, modelTier: "default"});
+      applyBill(d || {}, "bill photo");
+    } catch (e) {
+      st.className = "status err";
+      st.textContent = e.code === "not_granted" ? "Photo reading was declined. Paste the bill text instead." :
+        e.code === "rate_limited" ? "Too many requests right now. Try again in a minute." :
+        e.code === "image_rejected" ? "That image couldn't be read. Try a clearer photo or a screenshot." :
+        "Couldn't read the photo. Paste the bill text or enter your numbers.";
+    } finally { btn.disabled = false; }
+    return;
+  }
+  applyBill(parseBillText(txt), "bill text");
+});
+
+/* ---------- Rate table ---------- */
+if (document.getElementById("rate-table")) {
+let sortKey = "rate", sortDir = 1;
+const maxRate = Math.max(...STATES.map(s => s.rate));
+function drawTable() {
+  const q = $("filter").value.trim().toLowerCase();
+  const rows = STATES.filter(s => !q || s.name.toLowerCase().includes(q) || s.code.toLowerCase() === q)
+    .sort((a,b) => (a[sortKey] > b[sortKey] ? 1 : a[sortKey] < b[sortKey] ? -1 : 0) * sortDir);
+  document.querySelector("#rate-table tbody").innerHTML = rows.map(s => `
+    <tr>
+      <td><a href="/electricity-rates/${slug(s.name)}/">${s.name}</a></td>
+      <td class="num"><span class="bar" style="width:${Math.round(s.rate / maxRate * 70)}px" aria-hidden="true"></span>${s.rate.toFixed(2)}</td>
+      <td class="num">$${s.bill}</td>
+      <td class="num">${s.yoy > 0 ? "+" : ""}${s.yoy.toFixed(1)}%</td>
+      <td>${CHOICE.has(s.code) ? '<span class="tag choice">Choice</span>' : LIMITED.has(s.code) ? '<span class="tag">Limited</span>' : '<span class="tag">Regulated</span>'}</td>
+    </tr>`).join("") || `<tr><td colspan="5">No state matches "${q.replace(/[<>&]/g,"")}".</td></tr>`;
+}
+document.querySelectorAll("th button").forEach(b => b.addEventListener("click", () => {
+  const k = b.dataset.sort; sortDir = sortKey === k ? -sortDir : 1; sortKey = k; drawTable();
+}));
+$("filter").addEventListener("input", drawTable);
+drawTable();
+}
+
+/* Partner links: replace href with your affiliate URLs per state/plan type */
+document.addEventListener("click", e => { const a = e.target.closest("a.go"); if (a && a.getAttribute("href") === "#") e.preventDefault(); });
+</script>
+</body>
+</html>

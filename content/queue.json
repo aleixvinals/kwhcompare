@@ -1,0 +1,146 @@
+[
+ {
+  "keyword": "how many kwh does a house use per month",
+  "title": "How Many kWh Does a House Use per Month?",
+  "angle": "Typical monthly kWh by home size and state (use state avg bill / rate from fact pack), what drives usage, how to find yours on the bill, worked example.",
+  "status": "pending"
+ },
+ {
+  "keyword": "electric bill breakdown",
+  "title": "Electric Bill Breakdown: Every Charge Explained",
+  "angle": "Walk through each line: energy/supply, delivery/TDU, base fee, taxes, fees; deregulated vs regulated bills; Texas example with TDU figures from fact pack.",
+  "status": "pending"
+ },
+ {
+  "keyword": "are free nights electricity plans worth it",
+  "title": "Are Free Nights Electricity Plans Worth It?",
+  "angle": "How free nights/weekends plans price daytime vs night, break-even math with worked example, who benefits (EV owners, night shift), link to EFL guide and EV article.",
+  "status": "pending"
+ },
+ {
+  "keyword": "how to lower electric bill in winter",
+  "title": "How to Lower Your Electric Bill in Winter: 12 Tips",
+  "angle": "Heat pumps and heat strips, thermostat 68\u00b0F DOE guidance, space heater cost math, sealing drafts, water heater, plan choice before winter.",
+  "status": "pending"
+ },
+ {
+  "keyword": "what is a kilowatt hour",
+  "title": "What Is a Kilowatt-Hour (kWh)? Simple Explanation",
+  "angle": "Explain watts vs kWh with everyday appliance examples and cost math at US average rate; how to read kWh on your bill.",
+  "status": "pending"
+ },
+ {
+  "keyword": "how to switch electricity providers in texas",
+  "title": "How to Switch Electricity Providers in Texas, Step by Step",
+  "angle": "Step-by-step process, what you need (ESI ID, usage history), timing within 14-day window, rescission period, what happens to old provider, no outage.",
+  "status": "pending"
+ },
+ {
+  "keyword": "prepaid electricity texas",
+  "title": "Prepaid Electricity in Texas: Pros, Cons and Costs",
+  "angle": "How prepaid works, no deposit, daily alerts, disconnection risk, price comparison vs postpaid, who it suits; link to no-deposit article.",
+  "status": "pending"
+ },
+ {
+  "keyword": "set up electricity houston",
+  "title": "How to Set Up Electricity in Houston When You Move",
+  "angle": "Houston is CenterPoint territory (fact pack delivery charges), steps before move-in, deposit waivers, ESI ID, picking a plan at your usage; link Houston page.",
+  "status": "pending"
+ },
+ {
+  "keyword": "set up electricity dallas",
+  "title": "How to Set Up Electricity in Dallas When You Move",
+  "angle": "Dallas is Oncor territory (fact pack), steps before move-in, deposits, ESI ID, summer usage; link Dallas page.",
+  "status": "pending"
+ },
+ {
+  "keyword": "smart meter texas",
+  "title": "Smart Meter Texas: How to See Your Usage",
+  "angle": "What the Smart Meter Texas portal is, how to register with ESI ID and meter number, reading interval data, using it to compare plans. Describe steps generally.",
+  "status": "pending"
+ },
+ {
+  "keyword": "time of use electricity rates",
+  "title": "Time-of-Use Electricity Rates Explained",
+  "angle": "Peak vs off-peak pricing, who benefits, how to shift load, worked example of savings, regulated utilities vs Texas retail TOU plans.",
+  "status": "pending"
+ },
+ {
+  "keyword": "budget billing electricity",
+  "title": "Budget Billing for Electricity: Pros and Cons",
+  "angle": "Average/level billing explained, true-up, who benefits, doesn't lower total cost, Texas average billing; worked example with seasonal usage.",
+  "status": "pending"
+ },
+ {
+  "keyword": "early termination fee electricity texas",
+  "title": "Early Termination Fees on Texas Electricity Plans",
+  "angle": "Typical ETF structures (flat vs per month remaining, describe generally), when you don't have to pay (14-day window, moving), how to calculate if switching is worth it.",
+  "status": "pending"
+ },
+ {
+  "keyword": "how much does it cost to run an air conditioner",
+  "title": "How Much Does It Cost to Run an Air Conditioner?",
+  "angle": "Cost per hour/day/month by AC size (kW draw typical ranges), worked math at US and Texas averages, ways to reduce.",
+  "status": "pending"
+ },
+ {
+  "keyword": "pool pump electricity cost",
+  "title": "How Much Electricity Does a Pool Pump Use?",
+  "angle": "Single-speed vs variable-speed pumps, typical kWh, monthly cost math at state rates from fact pack, runtime tips.",
+  "status": "pending"
+ },
+ {
+  "keyword": "space heater cost per hour",
+  "title": "How Much Does a Space Heater Cost to Run per Hour?",
+  "angle": "1,500 W math: 1.5 kWh per hour times state rates (fact pack table), monthly scenarios, when space heaters save vs cost more.",
+  "status": "pending"
+ },
+ {
+  "keyword": "why are electricity prices going up",
+  "title": "Why Are Electricity Prices Going Up in 2026?",
+  "angle": "Use fact pack 1-year changes by state (highest risers), drivers: grid investment, demand growth from data centers and electrification, fuel costs, weather. Qualitative on drivers, precise on fact pack numbers.",
+  "status": "pending"
+ },
+ {
+  "keyword": "help paying electric bill",
+  "title": "How to Get Help Paying Your Electric Bill",
+  "angle": "LIHEAP basics, utility hardship programs, payment plans, deferred payment, deposit waivers in Texas; no invented program amounts.",
+  "status": "pending"
+ },
+ {
+  "keyword": "renewable energy plans texas",
+  "title": "100% Renewable Electricity Plans in Texas Explained",
+  "angle": "How green plans work with renewable energy certificates, whether they cost more, how to read renewable content on the EFL.",
+  "status": "pending"
+ },
+ {
+  "keyword": "price to compare pennsylvania",
+  "title": "Price to Compare in Pennsylvania: What It Means",
+  "angle": "Default service price explained, how to compare supplier offers, PA average rate from fact pack, fixed vs variable, contract checks.",
+  "status": "pending"
+ },
+ {
+  "keyword": "ohio electricity choice",
+  "title": "Ohio Electricity Choice: How to Shop for a Better Rate",
+  "angle": "Ohio deregulation basics, utility vs supplier, default rate, Ohio average from fact pack, how to compare offers safely.",
+  "status": "pending"
+ },
+ {
+  "keyword": "are solar panels worth it in texas",
+  "title": "Are Solar Panels Worth It in Texas?",
+  "angle": "Payback logic with Texas average rate, buyback plans in retail market vary, factors: roof, usage, financing; community solar comparison; avoid specific incentive amounts.",
+  "status": "pending"
+ },
+ {
+  "keyword": "how much electricity does a refrigerator use",
+  "title": "How Much Electricity Does a Refrigerator Use?",
+  "angle": "Typical kWh/year ranges for new vs old fridges, cost math at state rates, second fridge in garage cost.",
+  "status": "pending"
+ },
+ {
+  "keyword": "illinois electricity rates",
+  "title": "Illinois Electricity Rates: How to Save on ComEd and Ameren",
+  "angle": "Illinois average from fact pack, utilities ComEd/Ameren, supplier choice, price to compare concept, community solar in Illinois.",
+  "status": "pending"
+ }
+]
