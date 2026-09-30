@@ -1,0 +1,55 @@
+name: Publish article
+
+on:
+  schedule:
+    - cron: "0 13 * * 2,5"   # Tuesdays and Fridays, 13:00 UTC (8 AM Texas time)
+  workflow_dispatch: {}       # "Run workflow" button for manual runs
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency: publish-article
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Write the next article
+        id: article
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL || 'claude-sonnet-5' }}
+        run: python3 scripts/write_article.py
+
+      - name: Check the site builds
+        run: python3 build.py
+
+      - name: Publish (review first, or straight to the site)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ vars.PUBLISH_MODE || 'review' }}
+          TITLE: ${{ steps.article.outputs.title }}
+          SLUG: ${{ steps.article.outputs.slug }}
+        run: |
+          git config user.name "kwhcompare-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add content/
+          if [ "$MODE" = "auto" ]; then
+            git commit -m "New article: $TITLE"
+            git push
+          else
+            BRANCH="article/$SLUG"
+            git checkout -b "$BRANCH"
+            git commit -m "New article: $TITLE"
+            git push -u origin "$BRANCH"
+            gh pr create --title "New article: $TITLE" \
+              --body "Review the article, then press **Merge pull request** to publish it. Netlify will show a preview link below within a couple of minutes. File: content/articles/ (search for $SLUG)." \
+              --base main --head "$BRANCH"
+          fi
