@@ -9,6 +9,7 @@ import datetime, glob, json, os, re, sys, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
+sys.path.insert(0, ROOT)
 MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-5")
 API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 TODAY = os.environ.get("ARTICLE_DATE", datetime.date.today().isoformat())
