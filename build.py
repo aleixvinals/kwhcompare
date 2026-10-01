@@ -230,7 +230,13 @@ def simple(path,title,desc,body):
 </body></html>'''
 
 import os
+import hashlib
+def _ver(f):
+    return hashlib.md5(open(f,'rb').read()).hexdigest()[:10]
+ASSET_V={a:_ver('static/assets/'+a) for a in ('site.css','app.js','tx.js')}
 def write(path,content):
+    for a,v in ASSET_V.items():
+        content=content.replace(f'/assets/{a}"',f'/assets/{a}?v={v}"')
     if AD_LOADER and '</body>' in content: content=content.replace('</body>',AD_LOADER+'\n</body>',1)
     p='site'+path+('index.html' if path.endswith('/') else '')
     os.makedirs(os.path.dirname(p),exist_ok=True); open(p,'w').write(content)
