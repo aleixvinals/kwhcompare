@@ -52,13 +52,6 @@ try {
 
 if (document.body.dataset.state) sel.value = document.body.dataset.state;
 
-/* ---------- Tabs ---------- */
-const tabs = [["tab-manual","p-manual"],["tab-bill","p-bill"]];
-function showTab(id) {
-  tabs.forEach(([t,p]) => { const on = t === id; $(t).setAttribute("aria-selected", on); $(p).hidden = !on; });
-}
-tabs.forEach(([t]) => $(t).addEventListener("click", () => showTab(t)));
-
 /* ---------- ESI ID detection ---------- */
 function detectEsi(raw) {
   const d = (raw || "").replace(/\D/g, "");
@@ -153,91 +146,6 @@ $("run").addEventListener("click", () => {
   if (missing) { missing.focus(); missing.reportValidity?.(); $("results").hidden = false; $("results").innerHTML = `<p class="status err">Add your ${missing === sel ? "state" : missing.id === "kwh" ? "kWh used" : "total bill amount"} to compare.</p>`; return; }
   try { localStorage.setItem("kwhc-last", JSON.stringify({state, kwh, total})); } catch (e) {}
   render({state, kwh, total});
-});
-
-/* ---------- Bill reading ---------- */
-function parseBillText(txt) {
-  const t = txt.replace(/,/g, "");
-  const out = {};
-  const k = t.match(/(\d{2,5}(?:\.\d+)?)\s*kwh/i) || t.match(/kwh[^\d]{0,30}(\d{2,5}(?:\.\d+)?)/i);
-  if (k) out.kwh = parseFloat(k[1]);
-  const a = t.match(/(?:total (?:amount )?due|amount due|total due|total charges|balance due|please pay)[^\d$]{0,30}\$?\s*(\d+\.\d{2})/i);
-  if (a) out.total = parseFloat(a[1]);
-  const esi = t.match(/\b(\d{17}(?:\d{5})?)\b/);
-  if (esi) out.esi = esi[1];
-  const st = STATES.find(s => new RegExp("\\b" + s.name + "\\b", "i").test(t)) ||
-             STATES.find(s => new RegExp(",\\s*" + s.code + "\\s+\\d{5}").test(t));
-  if (st) out.state = st.code;
-  return out;
-}
-
-function applyBill(d, source) {
-  const st = $("bill-status");
-  if (d.state && byCode[d.state]) sel.value = d.state;
-  if (d.kwh) $("kwh").value = d.kwh;
-  if (d.total) $("total").value = d.total;
-  if (d.esi) { $("esi").value = d.esi; $("esi").dispatchEvent(new Event("input")); }
-  const found = [d.kwh && "kWh used", d.total && "amount due", d.state && "state", d.esi && "ESI ID", d.utility && "utility"].filter(Boolean);
-  if (d.kwh && d.total && sel.value) {
-    st.className = "status"; st.textContent = `Read ${found.join(", ")} from your ${source}${d.utility ? " (" + d.utility + ")" : ""}.`;
-    render({state: sel.value, kwh: d.kwh, total: d.total});
-  } else {
-    st.className = "status err";
-    st.textContent = found.length ? `Found ${found.join(", ")}. Add the rest in "Enter my numbers" to finish.` : "Couldn't find kWh or amount due. Enter them in \"Enter my numbers\".";
-    if (found.length) setTimeout(() => showTab("tab-manual"), 1400);
-  }
-}
-
-let photo = null, sample = null;
-const drop = $("drop"), fileIn = $("file");
-drop.addEventListener("click", () => fileIn.click());
-drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileIn.click(); } });
-["dragover","dragenter"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
-["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
-drop.addEventListener("drop", e => { if (e.dataTransfer.files[0]) setPhoto(e.dataTransfer.files[0]); });
-fileIn.addEventListener("change", () => { if (fileIn.files[0]) setPhoto(fileIn.files[0]); });
-function setPhoto(f) {
-  photo = f;
-  drop.querySelector("strong").textContent = f.name;
-  drop.querySelector(".hint").textContent = "Ready. Press \"Read my bill\".";
-}
-
-// Photo reading needs an AI backend. Inside Claude it uses the viewer's Claude; on your own site, swap in your API endpoint.
-(async () => {
-  $("photo-area").hidden = true;
-  try {
-    if (!window.claude?.use) return;
-    sample = await window.claude.use("sample");
-    if (!sample) return;
-    const lim = await sample.limits().catch(() => null);
-    if (lim?.images) { fileIn.accept = lim.images.mediaTypes.join(","); $("photo-area").hidden = false; }
-  } catch (e) {}
-})();
-
-$("read").addEventListener("click", async () => {
-  const st = $("bill-status"), btn = $("read");
-  const txt = $("billtext").value.trim();
-  if (!photo && !txt) { st.className = "status err"; st.textContent = "Add a bill photo or paste the bill text first."; return; }
-
-  if (photo && sample) {
-    btn.disabled = true; st.className = "status"; st.textContent = "Reading your bill…";
-    try {
-      const d = await sample.json(
-        `The image is a U.S. residential electric bill. Extract these fields and reply with only one JSON object, no prose:
-{"utility": string|null, "state": two-letter US state code|null, "kwh": number|null (energy used this billing period), "total": number|null (total amount due in USD), "supply_rate_cents": number|null, "esi": string|null (Texas ESI ID digits or account number)}
-Use null for anything not visible. Numbers without units or commas.`,
-        {images: photo, modelTier: "default"});
-      applyBill(d || {}, "bill photo");
-    } catch (e) {
-      st.className = "status err";
-      st.textContent = e.code === "not_granted" ? "Photo reading was declined. Paste the bill text instead." :
-        e.code === "rate_limited" ? "Too many requests right now. Try again in a minute." :
-        e.code === "image_rejected" ? "That image couldn't be read. Try a clearer photo or a screenshot." :
-        "Couldn't read the photo. Paste the bill text or enter your numbers.";
-    } finally { btn.disabled = false; }
-    return;
-  }
-  applyBill(parseBillText(txt), "bill text");
 });
 
 /* ---------- Rate table ---------- */

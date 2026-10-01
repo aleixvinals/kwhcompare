@@ -47,7 +47,7 @@
         {"@type": "Question", "name": "How do I calculate my electricity rate per kWh?",
          "acceptedAnswer": {"@type": "Answer", "text": "Divide the total amount of your bill by the kWh used in that billing period. For example, $180 for 1,000 kWh is 18 cents per kWh."}},
         {"@type": "Question", "name": "Is my bill data stored?",
-         "acceptedAnswer": {"@type": "Answer", "text": "No. Numbers you type are calculated in your browser. A bill photo is only sent for reading when you choose to analyze it, and it is not saved."}}
+         "acceptedAnswer": {"@type": "Answer", "text": "No. The numbers you type are calculated in your browser and are never sent to us or stored."}}
       ]
     }
   ]
@@ -262,7 +262,7 @@ td a{font-weight:600}
   <div class="wrap hero-grid">
     <div>
       <h1>Are you overpaying for electricity?</h1>
-      <p class="lede">Upload a photo of your electric bill or type in two numbers. We compare your rate with your state's average and show cheaper ways to pay for the same power.</p>
+      <p class="lede">Type in two numbers from your electric bill. We compare your rate with your state's average and show cheaper ways to pay for the same power.</p>
       <dl class="facts">
         <div><dt>U.S. average</dt><dd>18.34¢/kWh</dd></div>
         <div><dt>Cheapest state</dt><dd>Nevada 13.1¢</dd></div>
@@ -271,12 +271,8 @@ td a{font-weight:600}
     </div>
 
     <div class="tool" id="compare">
-      <div class="tabs" role="tablist">
-        <button role="tab" id="tab-manual" aria-selected="true" aria-controls="p-manual">Enter my numbers</button>
-        <button role="tab" id="tab-bill" aria-selected="false" aria-controls="p-bill">Upload my bill</button>
-      </div>
 
-      <div class="panel" id="p-manual" role="tabpanel" aria-labelledby="tab-manual">
+      <div class="panel" id="p-manual">
         <div class="field">
           <label for="state">Your state</label>
           <select id="state" required></select>
@@ -297,23 +293,6 @@ td a{font-weight:600}
           <div class="esi-note" id="esi-note" aria-live="polite"></div>
         </div>
         <button class="btn meter" id="run">Compare my rate</button>
-      </div>
-
-      <div class="panel" id="p-bill" role="tabpanel" aria-labelledby="tab-bill" hidden>
-        <div id="photo-area">
-          <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a photo or screenshot of your bill">
-            <strong>Drop a photo or screenshot of your bill</strong>
-            <span class="hint">or tap to choose one. JPG, PNG or WEBP.</span>
-          </div>
-          <input type="file" id="file" accept="image/*" hidden>
-          <p class="or">or</p>
-        </div>
-        <div class="field">
-          <label for="billtext">Paste the text of your bill</label>
-          <textarea id="billtext" placeholder="Copy the text from your PDF bill and paste it here. We look for kWh used, amount due and your ESI ID."></textarea>
-        </div>
-        <button class="btn" id="read">Read my bill</button>
-        <p class="status" id="bill-status" aria-live="polite"></p>
       </div>
 
       <div id="results" hidden aria-live="polite"></div>
@@ -418,7 +397,7 @@ td a{font-weight:600}
     <details><summary>What is an ESI ID and where do I find it?</summary><p>The Electric Service Identifier is a 17- or 22-digit number unique to your meter in deregulated Texas. It's printed on your bill near your service address. The first digits identify your utility, such as CenterPoint or Oncor.</p></details>
     <details><summary>How do I calculate my cost per kWh?</summary><p>Divide your total bill by the kWh you used. $182 ÷ 1,000 kWh = 18.2¢ per kWh. This all-in figure is the fairest way to compare plans.</p></details>
     <details><summary>Will switching cause a power outage?</summary><p>No. Your utility keeps delivering power over the same lines. Only the company that bills you for supply changes.</p></details>
-    <details><summary>Do you store my bill?</summary><p>No. Numbers you type are calculated in your browser. A bill photo is only sent for reading when you press "Read my bill," and it isn't saved.</p></details>
+    <details><summary>Do you store my bill?</summary><p>No. The numbers you type are calculated in your browser and are never sent to us or stored.</p></details>
   </div>
 </section>
 </main>

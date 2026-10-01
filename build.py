@@ -45,7 +45,14 @@ andjoin=lambda l: l[0] if len(l)==1 else ", ".join(l[:-1])+" and "+l[-1]
 
 css_link='<link rel="stylesheet" href="/assets/site.css">'
 fonts='<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">'
-ADS='<!-- Google AdSense: paste your script here once approved -->\n<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXX" crossorigin="anonymous"></script> -->'
+CFG=json.load(open('site.config.json')) if os.path.exists('site.config.json') else {}
+AD_CLIENT=(CFG.get('adsense_client') or '').strip()
+AD_SLOTS=CFG.get('ad_slots') or {}
+AD_PLACEHOLDERS=bool(CFG.get('show_ad_placeholders')) or os.environ.get('AD_PLACEHOLDERS')=='1'
+ADS_ON=bool(AD_CLIENT)
+ADS=(f'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={AD_CLIENT}" crossorigin="anonymous"></script>' if ADS_ON
+     else '<!-- Google AdSense: add your publisher ID in site.config.json to switch ads on -->')
+AD_LOADER=('<script>document.querySelectorAll("ins.adsbygoogle").forEach(function(i){if(i.offsetWidth>0&&!i.dataset.adsbygoogleStatus){(window.adsbygoogle=window.adsbygoogle||[]).push({});}});</script>' if ADS_ON else '')
 header=src.split('<header class="site">')[1].split('</header>')[0]
 header=header.replace('<a href="#faq">FAQ</a>','<a href="/esi-id-lookup/">ESI ID lookup</a>\n      <a href="#faq">FAQ</a>')
 header=header.replace('<a href="#read-bill">Read your bill</a>','<a href="#texas">Texas</a>\n      <a href="#esi">ESI ID lookup</a>\n      <a href="#blog">Guides</a>')
@@ -61,7 +68,26 @@ footer=f'''<footer>
 </footer>'''
 tool=src.split('<div class="tool" id="compare">')[1].split('<div id="results" hidden aria-live="polite"></div>')[0]
 tool='<div class="tool" id="compare">'+tool+'<div id="results" hidden aria-live="polite"></div>\n    </div>'
-ad=lambda n:f'<div class="wrap"><div class="ad-slot" aria-label="Advertisement"><!-- AdSense unit {n} -->Advertisement</div></div>'
+def ad(n=1, kind="display", wrap=True):
+    """One ad unit. Nothing is rendered until AdSense is configured (or placeholders are on for previews)."""
+    if not (ADS_ON or AD_PLACEHOLDERS): return ""
+    if ADS_ON:
+        slot=AD_SLOTS.get(kind) or AD_SLOTS.get("display") or ""
+        if not slot: return ""
+        if kind=="in_article":
+            unit=f'<ins class="adsbygoogle" style="display:block;text-align:center" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="{AD_CLIENT}" data-ad-slot="{slot}"></ins>'
+        elif kind=="sidebar":
+            unit=f'<ins class="adsbygoogle" style="display:block" data-ad-client="{AD_CLIENT}" data-ad-slot="{slot}" data-ad-format="vertical"></ins>'
+        else:
+            unit=f'<ins class="adsbygoogle" style="display:block" data-ad-client="{AD_CLIENT}" data-ad-slot="{slot}" data-ad-format="auto" data-full-width-responsive="true"></ins>'
+    else:
+        unit='<div class="ad-ph">Ad space</div>'
+    box=f'<aside class="ad ad-{kind.replace("_","-")}" aria-label="Advertisement"><span class="ad-label">Advertisement</span>{unit}</aside>'
+    return f'<div class="wrap">{box}</div>' if wrap else box
+import design as D
+ALL_ARTS=D.load_articles()
+header=D.make_header()
+footer=D.make_footer(ALL_ARTS)
 
 def head(title,desc,path,ld,extra=""):
     return f'''<!DOCTYPE html>
@@ -141,11 +167,11 @@ def state_page(s):
         <div><dt>Avg monthly bill</dt><dd>${s['bill']}</dd></div>
         <div><dt>Past 12 months</dt><dd>{'+' if s['yoy']>0 else ''}{s['yoy']:.1f}%</dd></div>
       </dl>
+      {D.figure("texas" if c=="TX" else "power-lines","hero-photo")}
     </div>
     {tool}
   </div>
 </section>
-{ad(1)}
 <section class="content">
   <div class="wrap prose">
     <h2>How {n} electricity prices compare</h2>
@@ -160,6 +186,7 @@ def state_page(s):
     <p>To find your own rate, divide your total bill by the kWh you used. If you paid ${s['bill']} for {kwh:,} kWh, you're right at the {n} average.</p>
   </div>
 </section>
+{ad(1)}
 <section class="content">
   <div class="wrap two-col">
     <div class="prose">{market}
@@ -204,6 +231,7 @@ def simple(path,title,desc,body):
 
 import os
 def write(path,content):
+    if AD_LOADER and '</body>' in content: content=content.replace('</body>',AD_LOADER+'\n</body>',1)
     p='site'+path+('index.html' if path.endswith('/') else '')
     os.makedirs(os.path.dirname(p),exist_ok=True); open(p,'w').write(content)
 
@@ -226,7 +254,7 @@ write("/",home)
 
 priv="""<p>Last updated September 25, 2026.</p>
 <h2>What we collect</h2><p>Numbers you type into the comparison tool (state, kWh, bill amount, ESI ID) are processed in your browser. Your last entries may be remembered in your browser's local storage so you don't have to retype them; you can clear this in your browser settings. We don't ask for your name, email or address.</p>
-<h2>Bill text and photos</h2><p>Bill text you paste is read in your browser and isn't sent to us. We don't store bills.</p>
+<h2>Your bill numbers</h2><p>The numbers you enter in our calculators are processed in your browser and never sent to us. We don't ask for or store your bill.</p>
 <h2>Advertising and cookies</h2><p>We use Google AdSense to show ads. Google and its partners use cookies to serve ads based on your prior visits to this and other websites. You can opt out of personalized advertising at Google's Ads Settings (adssettings.google.com) or at aboutads.info. Third-party vendors may also use cookies in line with their own policies.</p>
 <h2>Analytics</h2><p>We may use privacy-friendly analytics to count visits and improve pages. This data is aggregated and not used to identify you.</p>
 <h2>Affiliate links</h2><p>Some links to electricity plans may be affiliate links. If you sign up through one, we may earn a commission at no cost to you. This never changes the rate you're offered.</p>
@@ -258,7 +286,7 @@ exec(open('tx.py').read())
 open('site/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
   "\n".join(f'  <url><loc>{SITE}{p}</loc><lastmod>{ISO}</lastmod></url>' for p in paths)+'\n</urlset>\n')
 open('site/robots.txt','w').write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
-open('site/ads.txt','w').write("# Replace with your AdSense line once approved:\n# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0\n")
+open('site/ads.txt','w').write(f"google.com, {AD_CLIENT.replace('ca-','')}, DIRECT, f08c47fec0942fa0\n" if ADS_ON else "# Add your AdSense publisher ID in site.config.json and this file fills itself in.\n")
 open('site/404.html','w').write(simple("/404/","Page not found","Page not found.",'<p>That page doesn\'t exist. <a href="/">Compare your electricity rate</a> or <a href="/#rates">browse rates by state</a>.</p>').replace('index, follow','noindex'))
 print(len(paths),"pages")
 
@@ -308,6 +336,7 @@ def city_page(city,k,clim):
         <div><dt>Delivery, 1,000 kWh</dt><dd>${d1:.2f}</dd></div>
         <div><dt>Texas average</dt><dd>{tx['rate']:.2f}¢</dd></div>
       </dl>
+      {D.figure("texas","hero-photo")}
     </div>
     <div class="tool" id="tc" data-tdu="{k}">
       <div class="panel">
@@ -325,7 +354,6 @@ def city_page(city,k,clim):
     </div>
   </div>
 </section>
-{ad(1)}
 <section class="content">
   <div class="wrap two-col">
     <div class="prose">
@@ -342,6 +370,7 @@ def city_page(city,k,clim):
     </div>
   </div>
 </section>
+{ad(1)}
 <section class="content">
   <div class="wrap">
     <h2>How {city} delivery compares with the rest of Texas</h2>
@@ -411,6 +440,7 @@ esi=head("Texas ESI ID Lookup: Find & Decode Your ESI ID (2026) | kWhCompare",
       <h1>Texas ESI ID lookup</h1>
       <p class="lede">Type your ESI ID to see which utility serves your home, what it charges for delivery and who to call in an outage.</p>
       <p class="hint">We decode the number in your browser and don't store it.</p>
+      {D.figure("meter","hero-photo")}
     </div>
     <div class="tool">
       <div class="panel">
@@ -425,7 +455,6 @@ esi=head("Texas ESI ID Lookup: Find & Decode Your ESI ID (2026) | kWhCompare",
     </div>
   </div>
 </section>
-{ad(1)}
 <section class="content">
   <div class="wrap two-col">
     <div class="prose">
@@ -442,19 +471,20 @@ esi=head("Texas ESI ID Lookup: Find & Decode Your ESI ID (2026) | kWhCompare",
     </div>
   </div>
 </section>
+{ad(1)}
 <section class="content">
   <div class="wrap">
     <h2>ESI ID prefixes by utility</h2>
     <div class="scroll"><table><thead><tr><th>Utility</th><th>Starts with</th><th class="num">Digits</th><th>Outages</th></tr></thead><tbody>{prefix_rows}</tbody></table></div>
   </div>
 </section>
-{ad(2)}
 <section class="content">
   <div class="wrap">
     <h2>ESI ID FAQ</h2>
     {''.join(f'<details><summary>{e(q)}</summary><p>{e(a)}</p></details>' for q,a in esi_faq)}
   </div>
 </section>
+{ad(2)}
 </main>
 {footer}
 {txjs}
@@ -562,7 +592,7 @@ for a in ARTICLES:
         {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":ans}} for q,ans in a['faq']]}]}
     # split body after the first h2 section to place a mid-article ad
     parts=a['body'].split('<h2>'); mid=len(parts)//2+1
-    body='<h2>'.join(parts[:mid])+ad(2).replace('<div class="wrap">','<div>')+'<h2>'+'<h2>'.join(parts[mid:])
+    body='<h2>'.join(parts[:mid])+ad(2,"in_article",False)+'<h2>'+'<h2>'.join(parts[mid:]) if len(parts)>4 else a['body']
     others=[o for o in ARTICLES if o is not a]
     tname,tdesc,turl=a['tool']
     html_=head(a['title']+" | kWhCompare",a['desc'],path,ld,'<meta property="article:published_time" content="%s">\n'%a['date']).replace('<meta property="og:type" content="website">','<meta property="og:type" content="article">')+f'''
@@ -570,12 +600,14 @@ for a in ARTICLES:
 {header}
 <main>
 <div class="wrap crumbs"><a href="/">Home</a> / <a href="/blog/">Guides</a> / {e(a['h1'])}</div>
-<article class="content" style="border:0">
-  <div class="wrap prose">
+<div class="wrap article-layout">
+<article class="content prose" style="border:0">
+    <span class="kicker">{D.art_meta(a)[0]}</span>
     <h1 style="font-size:clamp(2rem,4.8vw,3.1rem)">{e(a['h1'][0].upper()+a['h1'][1:])}</h1>
     <p class="hint" style="margin:0 0 1.2rem">By the kWhCompare Editorial Team · Updated {nice(a['date'])} · {a['mins']} min read</p>
     <p class="lede" style="max-width:62ch">{a['lede']}</p>
-    {ad(1).replace('<div class="wrap">','<div>')}
+    {D.figure(D.art_meta(a)[1],"article-photo",True)}
+    {ad(1,"in_article",False)}
     {body}
     <div class="bill-anatomy" style="margin:2rem 0;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between">
       <div><strong>{tname}</strong><br><span class="hint">{tdesc}</span></div>
@@ -586,8 +618,16 @@ for a in ARTICLES:
     <h2 style="font-size:1.2rem;margin-top:2rem">Sources</h2>
     <ul class="hint">{''.join(f'<li>{e(s)}</li>' for s in a['sources'])}</ul>
     <p class="hint">Figures are checked against these sources when each guide is updated. See <a href="/methodology/">how we research and calculate</a>. This guide is for general information and isn't financial advice.</p>
-  </div>
+    {ad(3,"display",False)}
 </article>
+<aside class="sidebar" aria-label="Related tools">
+  <div class="sidebar-sticky">
+    <div class="side-card"><span class="kicker">Free tool</span><strong>Are you overpaying?</strong><p>Compare your rate with your state's average in 30 seconds.</p><a class="btn meter" href="/#compare">Check my bill</a></div>
+    <div class="side-card side-links"><strong>Popular tools</strong><ul><li><a href="/#rates">Rates by state</a></li><li><a href="/electricity-rates/texas/#texas-cities">Texas plan calculator</a></li><li><a href="/esi-id-lookup/">ESI ID lookup</a></li><li><a href="/texas/tdu-delivery-charges/">TDU delivery charges</a></li></ul></div>
+    {ad(4,"sidebar",False)}
+  </div>
+</aside>
+</div>
 <section class="content">
   <div class="wrap">
     <h2>More guides</h2>
@@ -606,10 +646,7 @@ bp="/blog/"
 ld={"@context":"https://schema.org","@graph":[crumbs([("Home","/"),("Guides",bp)]),
     {"@type":"CollectionPage","name":"Electricity guides","url":SITE+bp,
      "hasPart":[{"@type":"Article","headline":a['title'],"url":f"{SITE}/blog/{a['slug']}/"} for a in ARTICLES]}]}
-cards="".join(f'''<li style="border-bottom:1px solid var(--line);padding:1.2rem 0">
-  <h2 style="font-size:1.35rem;margin:0 0 .3rem"><a href="/blog/{a['slug']}/" style="text-decoration:none">{e(a['h1'][0].upper()+a['h1'][1:])}</a></h2>
-  <p style="margin:0 0 .3rem;color:var(--ink-soft)">{e(a['desc'])}</p>
-  <span class="hint">{a['mins']} min read</span></li>''' for a in ARTICLES)
+cards="".join(D.guide_card(a,i<2) for i,a in enumerate(ARTICLES))
 blog_idx=head("Electricity Guides: Bills, Rates & Switching Plans | kWhCompare",
  "Plain-English guides to lowering your electric bill: why bills rise, how to read an EFL, fixed vs variable rates and when to switch providers.",bp,ld)+f'''
 <body>
@@ -617,10 +654,10 @@ blog_idx=head("Electricity Guides: Bills, Rates & Switching Plans | kWhCompare",
 <main>
 <div class="wrap crumbs"><a href="/">Home</a> / Guides</div>
 <section class="content" style="border:0">
-  <div class="wrap prose">
+  <div class="wrap">
     <h1 style="font-size:clamp(2rem,4.8vw,3.1rem)">Electricity guides</h1>
     <p class="lede">Plain-English answers to the questions behind every electric bill.</p>
-    <ul style="list-style:none;padding:0;margin:0">{cards}</ul>
+    <div class="gcard-grid">{cards}</div>
   </div>
 </section>
 {ad(1)}
@@ -639,3 +676,110 @@ open('site/index.html','w').write(hh)
 open('site/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
   "\n".join(f'  <url><loc>{SITE}{p}</loc><lastmod>{ISO}</lastmod></url>' for p in paths)+'\n</urlset>\n')
 print("with blog:",len(paths))
+
+# ================= HOME v2 =================
+def sec(id_):
+    m=re.search(r'<section class="content" id="%s">.*?</section>'%id_,src,flags=re.S); return m.group(0) if m else ""
+h_head=src.split('<body>')[0]
+h_head=re.sub(r'<style>.*?</style>',css_link,h_head,flags=re.S)
+h_head=re.sub(r'<!-- Google AdSense:.*?-->\s*','',h_head,flags=re.S).replace('</head>',ADS+'\n</head>',1)
+h_head=h_head.replace('https://kwhcompare.netlify.app',SITE).replace('https://www.kwhcompare.com',SITE)
+if 'rel="icon"' not in h_head:
+    h_head=h_head.replace('<meta name="theme-color" content="#14302b">','<meta name="theme-color" content="#14302b">\n<link rel="icon" href="data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'.9em\' font-size=\'90\'>⚡</text></svg>">')
+TOOLS=[("calc","Electric bill analyzer","Is your rate above your state's average? Find out in 30 seconds.","/#compare"),
+ ("map","Electricity rates by state","Average price, bill and 12-month change for all 50 states.","/#rates"),
+ ("receipt","Texas plan cost calculator","The real price of any plan at your usage, including delivery.","/electricity-rates/texas/#texas-cities"),
+ ("meter","ESI ID lookup","Decode your Texas ESI ID: utility, delivery charges, outage line.","/esi-id-lookup/"),
+ ("tower","TDU delivery charges","What Oncor, CenterPoint, AEP and TNMP charge to deliver power.","/texas/tdu-delivery-charges/"),
+ ("car","EV charging cost calculator","What charging at home costs versus gas, by state.","/blog/cost-to-charge-electric-car-at-home/")]
+tool_cards="".join(f'<a class="tcard" href="{u}"><span class="tcard-ico">{D.icon(i)}</span><span><strong>{t}</strong><span>{d}</span></span></a>' for i,t,d,u in TOOLS)
+risers=sorted(S,key=lambda s:-s['yoy'])[:6]; mx=risers[0]['yoy']
+bars="".join(f'''<a href="/electricity-rates/{slug(s['name'])}/"><text x="0" y="{i*40+24}" class="bl">{s['name']}</text>
+<rect x="150" y="{i*40+9}" width="{s['yoy']/mx*330:.0f}" height="20" rx="4" class="bar-r"/>
+<text x="{150+s['yoy']/mx*330+8:.0f}" y="{i*40+24}" class="bv">+{s['yoy']:.1f}%</text></a>''' for i,s in enumerate(risers))
+chart=f'<svg viewBox="0 0 540 {len(risers)*40}" class="chart" role="img" aria-label="States with the biggest 12-month electricity price increases: '+", ".join(f"{s['name']} {s['yoy']:.1f}%" for s in risers)+f'">{bars}</svg>'
+tx_links="".join(f'<li><a href="{u}">{t}</a></li>' for t,u in [("Houston","/electricity-rates/texas/houston/"),("Dallas","/electricity-rates/texas/dallas/"),("Fort Worth","/electricity-rates/texas/fort-worth/"),("Corpus Christi","/electricity-rates/texas/corpus-christi/"),("Midland","/electricity-rates/texas/midland/"),("All 37 cities","/electricity-rates/texas/#texas-cities")])
+TRUST=[("doc","Official sources","Every rate comes from the U.S. EIA or the Public Utility Commission of Texas, with the date shown."),
+ ("calc","Math in the open","Our methodology page shows exactly how every estimate is calculated."),
+ ("lock","Nothing stored","The numbers you type are calculated on your device and never sent to us."),
+ ("scale","No paid rankings","Providers and advertisers can't change our results or what we write.")]
+trust="".join(f'<div class="trust-item"><span class="tcard-ico">{D.icon(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i,t,d in TRUST)
+guides="".join(D.guide_card(a) for a in ALL_ARTS[:6])
+home2=h_head+f'''<body>
+{header}
+<main id="top">
+<section class="hero-band"{D.hero_bg()}>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="kicker light">Free electric bill analyzer</span>
+      <h1>Are you overpaying for electricity?</h1>
+      <p class="lede">Type in two numbers from your bill. We compare your rate with your state's average and show cheaper ways to pay for the same power.</p>
+      <ul class="checks">
+        <li><strong>Official data.</strong> Rates from the U.S. EIA and the Texas PUC.</li>
+        <li><strong>Private by design.</strong> Your numbers never leave your browser.</li>
+        <li><strong>Independent.</strong> No provider pays for placement.</li>
+      </ul>
+      <dl class="facts">
+        <div><dt>U.S. average</dt><dd>{US:.2f}¢/kWh</dd></div>
+        <div><dt>Cheapest state</dt><dd>{ranked[0]['name']} {ranked[0]['rate']:.1f}¢</dd></div>
+        <div><dt>Priciest state</dt><dd>{ranked[-1]['name']} {ranked[-1]['rate']:.1f}¢</dd></div>
+      </dl>
+    </div>
+    {tool}
+  </div>
+</section>
+<section class="content" id="tools">
+  <div class="wrap">
+    <h2>Free electricity tools</h2>
+    <p class="sub">No sign-up, no email, no sales calls.</p>
+    <div class="tcard-grid">{tool_cards}</div>
+  </div>
+</section>
+{ad(1)}
+<section class="content data-band">
+  <div class="wrap data-grid">
+    <div>
+      <span class="kicker">Latest data · {UPDATED}</span>
+      <p class="big-stat">{US:.2f}¢</p>
+      <h2>Electricity prices keep climbing</h2>
+      <p>The average U.S. home now pays {US:.2f}¢ per kWh, about 5% more than a year ago. In {risers[0]['name']} prices rose {risers[0]['yoy']:.0f}%. <a href="/blog/what-is-a-good-price-per-kwh/">Is your rate a good price?</a></p>
+    </div>
+    <figure class="chart-fig">{chart}<figcaption>States with the biggest 12-month increases in residential electricity prices. Source: U.S. Energy Information Administration.</figcaption></figure>
+  </div>
+</section>
+<section class="content" id="guides">
+  <div class="wrap">
+    <div class="sec-head"><h2>Guides</h2><a href="/blog/">All guides →</a></div>
+    <div class="gcard-grid">{guides}</div>
+  </div>
+</section>
+<section class="content" id="texas">
+  <div class="wrap feature">
+    {D.figure("texas","feature-photo")}
+    <div class="prose">
+      <span class="kicker">Texas</span>
+      <h2>Shopping for power in Texas?</h2>
+      <p>Most Texans choose their own provider, and the cheapest-looking plan often isn't. Pick your city to see your delivery charges and the true all-in price of any plan at your real usage.</p>
+      <ul class="state-links">{tx_links}</ul>
+    </div>
+  </div>
+</section>
+{ad(2)}
+{sec("rates")}
+<section class="content" id="trust">
+  <div class="wrap">
+    <h2>Why you can trust these numbers</h2>
+    <div class="trust-grid">{trust}</div>
+  </div>
+</section>
+{sec("choice")}
+{sec("read-bill")}
+{ad(3)}
+{sec("faq")}
+</main>
+{footer}
+<script src="/assets/app.js" defer></script>
+</body>
+</html>'''
+write("/",home2)
+print("home v2 written")

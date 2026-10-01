@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Illustration of an electric car plugged into a home wall charger"><defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3b3e"/><stop offset="1" stop-color="#1d2a2c"/></linearGradient><linearGradient id="car" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f8fa0"/><stop offset="1" stop-color="#2a6a78"/></linearGradient></defs><rect width="1600" height="1000" fill="url(#w)"/>
+<rect x="0" y="780" width="1600" height="220" fill="#3a4547"/><path d="M0 780 H1600" stroke="#55615f" stroke-width="6"/>
+<path d="M200 0 L320 120 H1280 L1400 0Z" fill="#33464a"/><rect x="560" y="120" width="480" height="18" rx="9" fill="#ffd97a" opacity=".85"/>
+<g transform="translate(1290 360)"><rect x="-70" y="0" width="140" height="210" rx="22" fill="#e9eeec"/><rect x="-45" y="30" width="90" height="56" rx="8" fill="#14302b"/>
+<path d="M5 40 L-12 64 H2 L-4 80 L14 54 H0Z" fill="#f2c230"/><circle cx="0" cy="140" r="26" fill="#c9d2ce"/><circle cx="0" cy="140" r="10" fill="#2e9a63"/></g>
+<path d="M1290 570 C1290 700 1150 690 1060 600" stroke="#111" stroke-width="16" fill="none" stroke-linecap="round"/>
+<g transform="translate(700 780)">
+<path d="M-460 -60 C-460 -130 -420 -150 -330 -160 L-210 -250 C-170 -280 -120 -290 -60 -290 L150 -290 C220 -290 260 -270 300 -230 L380 -160 C450 -150 470 -120 470 -60 L470 -10 L-460 -10Z" fill="url(#car)"/>
+<path d="M-180 -170 L-110 -240 C-90 -255 -70 -260 -40 -260 L60 -260 L60 -170Z M90 -170 L90 -260 L150 -260 C190 -260 215 -250 240 -225 L300 -170Z" fill="#bfe0e6" opacity=".85"/>
+<rect x="340" y="-120" width="80" height="22" rx="8" fill="#ffd97a"/><rect x="-450" y="-115" width="50" height="20" rx="8" fill="#e05a47"/>
+<circle cx="-260" cy="-10" r="82" fill="#111"/><circle cx="-260" cy="-10" r="42" fill="#9aa6a4"/>
+<circle cx="270" cy="-10" r="82" fill="#111"/><circle cx="270" cy="-10" r="42" fill="#9aa6a4"/>
+<rect x="355" y="-150" width="22" height="30" rx="5" fill="#111"/></g></svg>
