@@ -330,3 +330,41 @@ footer.site-foot a:hover{text-decoration:underline}
 .side-card p{margin:0 0 .9rem;color:var(--ink-soft);font-size:.92rem}
 .side-card .btn{width:100%;text-decoration:none}
 .side-links ul{list-style:none;padding:0;margin:.4rem 0 0;display:grid;gap:.5rem;font-size:.95rem}
+
+/* ================= Mobile fixes (v3) ================= */
+.article-layout > article{width:100%;min-width:0}
+.scroll{max-width:100%;-webkit-overflow-scrolling:touch}
+article.prose td{white-space:normal;min-width:7rem}
+article.prose td:first-child{min-width:9rem}
+article.prose img,article.prose svg,article.prose figure{max-width:100%}
+.prose{overflow-wrap:break-word}
+@media (max-width:640px){
+  article.prose h1{font-size:2rem !important;line-height:1.1}
+  article.prose h2{font-size:1.45rem}
+  .article-layout{gap:0}
+  .bill-anatomy[style*="flex"]{flex-direction:column;align-items:stretch !important}
+  .bill-anatomy .btn{width:100% !important}
+  th,td{padding:.55rem .65rem}
+  .statbox{gap:.6rem}
+  .statbox dd{font-size:1.1rem}
+  .facts{gap:.8rem}
+  .gcard-body{padding:.9rem 1rem 1.1rem}
+}
+.two-col > *,.data-grid > *,.feature > *,.hero-grid > *{min-width:0}
+
+/* ================= Mobile ads + header (v4) ================= */
+@media (max-width:640px){
+  /* Most mobile ads are 300x250 or 336x280: reserve 280px so nothing jumps when they load */
+  .ad{margin:2.75rem auto}
+  .ad ins.adsbygoogle,.ad-display ins.adsbygoogle,.ad-in-article ins.adsbygoogle,.ad-ph{min-height:280px}
+  .ad-in-article{margin:2.75rem 0}
+  /* Header scrolls away on phones so it never overlaps AdSense anchor ads or covers content */
+  header.site{position:static}
+  /* Trust bar: one message, centered, nothing cut off */
+  .trustbar .wrap{justify-content:center}
+  .trustbar span:not(:first-child){display:none}
+  /* Menu: wraps onto two lines instead of being cut off */
+  nav.top{flex-wrap:wrap;overflow:visible;row-gap:.35rem;column-gap:1rem}
+}
+/* Extra breathing room between ads and tappable cards/buttons (accidental-click policy) */
+.gcard-grid + .ad, .tcard-grid + .ad{margin-top:2.75rem}

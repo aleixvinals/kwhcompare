@@ -57,7 +57,7 @@ def hero_bg():
 
 # Article category + image, works for hand-written and automated articles
 RULES = [
- (r"\bev\b|electric car|charg", "EV", "ev-charging"),
+ (r"\bev\b|electric car|electric vehicle|ev-charging|charge-electric|charging", "EV", "ev-charging"),
  (r"solar", "Solar", "solar"),
  (r"summer|air condition|\bac\b", "Savings", "ac-unit"),
  (r"winter|heater|thermostat|heat pump", "Savings", "thermostat"),
