@@ -5,5 +5,14 @@
     "in_article": "",
     "sidebar": ""
   },
-  "show_ad_placeholders": false
+  "show_ad_placeholders": false,
+  "owner": {
+    "name": "Aleix Viñals",
+    "city": "Mataró (Barcelona)",
+    "country": "Spain",
+    "street_address": "",
+    "postal_code": "",
+    "tax_id": "",
+    "email": "hello@kwhcompare.com"
+  }
 }

@@ -368,3 +368,4 @@ article.prose img,article.prose svg,article.prose figure{max-width:100%}
 }
 /* Extra breathing room between ads and tappable cards/buttons (accidental-click policy) */
 .gcard-grid + .ad, .tcard-grid + .ad{margin-top:2.75rem}
+.prose .scroll + h2{margin-top:1.6rem}

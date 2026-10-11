@@ -258,24 +258,52 @@ allstates=" ".join(f'<li><a href="/electricity-rates/{slug(s["name"])}/">{s["nam
 home=home.replace('<section class="content" id="how">',f'<section class="content" id="states"><div class="wrap"><h2>Electricity rates in your state</h2><ul class="state-links">{allstates}</ul></div></section>\n<section class="content" id="how">')
 write("/",home)
 
-priv="""<p>Last updated September 25, 2026.</p>
-<h2>What we collect</h2><p>Numbers you type into the comparison tool (state, kWh, bill amount, ESI ID) are processed in your browser. Your last entries may be remembered in your browser's local storage so you don't have to retype them; you can clear this in your browser settings. We don't ask for your name, email or address.</p>
-<h2>Your bill numbers</h2><p>The numbers you enter in our calculators are processed in your browser and never sent to us. We don't ask for or store your bill.</p>
-<h2>Advertising and cookies</h2><p>We use Google AdSense to show ads. Google and its partners use cookies to serve ads based on your prior visits to this and other websites. You can opt out of personalized advertising at Google's Ads Settings (adssettings.google.com) or at aboutads.info. Third-party vendors may also use cookies in line with their own policies.</p>
+OWN=CFG.get('owner') or {}
+O_NAME=OWN.get('name','')
+O_PLACE=", ".join(x for x in [OWN.get('city',''),OWN.get('country','')] if x)
+O_EMAIL=OWN.get('email','hello@kwhcompare.com')
+O_ADDR=", ".join(x for x in [OWN.get('street_address',''),(OWN.get('postal_code','')+' '+OWN.get('city','')).strip() if OWN.get('street_address') else '',OWN.get('country','') if OWN.get('street_address') else ''] if x)
+O_TAX=OWN.get('tax_id','')
+LEGAL_UPDATED="October 11, 2026"
+owner_line=f"{O_NAME} ({O_PLACE})" if O_NAME else "kWhCompare"
+priv=f"""<p>Last updated {LEGAL_UPDATED}.</p>
+<h2>Who is responsible for your data</h2><p>kWhCompare.com is owned and operated by <strong>{O_NAME}</strong>, an individual based in {O_PLACE}, who is the data controller for this website. Contact: <a href="mailto:{O_EMAIL}">{O_EMAIL}</a>. See the <a href="/legal-notice/">legal notice</a> for full owner details.</p>
+<h2>What we collect</h2><p>Numbers you type into our calculators (state, kWh, bill amount, ESI ID) are processed in your browser and never sent to us. Your last entries may be remembered in your browser's local storage so you don't have to retype them; you can clear this in your browser settings. We don't ask for your name, address or bill.</p>
+<h2>Emails you send us</h2><p>If you write to {O_EMAIL}, we use your email address and message only to reply to you, and delete them when they're no longer needed.</p>
+<h2>Hosting and security</h2><p>The site is hosted by Cloudflare, which processes technical data such as IP addresses to deliver pages and protect the site from abuse.</p>
+<h2>Advertising and cookies</h2><p>We use Google AdSense to show ads. Google and its partners use cookies and similar technologies to serve and measure ads, including ads based on your prior visits to this and other websites. Learn <a href="https://policies.google.com/technologies/partner-sites" rel="nofollow">how Google uses information from sites that use its services</a>. You can opt out of personalized advertising in <a href="https://adssettings.google.com" rel="nofollow">Google's Ads Settings</a> or at <a href="https://www.aboutads.info" rel="nofollow">aboutads.info</a>. Visitors in the European Economic Area, the UK and Switzerland are asked for consent before personalized ads are shown, and can change their choice at any time.</p>
 <h2>Analytics</h2><p>We may use privacy-friendly analytics to count visits and improve pages. This data is aggregated and not used to identify you.</p>
 <h2>Affiliate links</h2><p>Some links to electricity plans may be affiliate links. If you sign up through one, we may earn a commission at no cost to you. This never changes the rate you're offered.</p>
-<h2>Your rights</h2><p>California residents have rights under the CCPA, including the right to know and delete personal information. Because we don't collect personal information directly, most requests can be handled by clearing your browser's cookies and storage. Contact us with any questions.</p>
+<h2>Legal bases (EU and UK visitors)</h2><p>We process data on the basis of your consent (advertising cookies), our legitimate interest in running and protecting the website (hosting and security), and to answer messages you send us.</p>
+<h2>Your rights</h2><p>Under the GDPR you can request access to, correction or deletion of your personal data, object to or restrict its processing, and withdraw consent at any time, by writing to {O_EMAIL}. You can also complain to the Spanish Data Protection Agency (<a href="https://www.aepd.es" rel="nofollow">aepd.es</a>). California residents have rights under the CCPA, including the right to know and delete personal information; we don't sell personal information. Because we don't collect personal information directly, most requests can be handled by clearing your browser's cookies and storage.</p>
 <h2>Children</h2><p>This site isn't directed at children under 13 and we don't knowingly collect their information.</p>"""
-terms="""<p>Last updated September 25, 2026.</p>
-<p>kWhCompare provides general information and estimates about U.S. electricity prices. Savings figures are estimates based on public average data and the numbers you enter; they aren't quotes, offers or advice from any electricity provider.</p>
-<p>Always read a plan's electricity facts label, terms of service and cancellation terms before switching. We aren't responsible for decisions made using this site.</p>
-<p>Rate data comes from the U.S. Energy Information Administration and may be revised. Content may change without notice.</p>"""
-about="""<p>kWhCompare helps U.S. households answer a simple question: am I paying too much for electricity?</p>
+terms=f"""<p>Last updated {LEGAL_UPDATED}.</p>
+<h2>Who we are</h2><p>kWhCompare.com is owned and operated by <strong>{O_NAME}</strong>, {O_PLACE}. Contact: <a href="mailto:{O_EMAIL}">{O_EMAIL}</a>. Full details are in the <a href="/legal-notice/">legal notice</a>.</p>
+<h2>Information, not advice</h2><p>kWhCompare provides general information and estimates about U.S. electricity prices. Savings figures are estimates based on public average data and the numbers you enter; they aren't quotes, offers or advice from any electricity provider, and they aren't financial advice.</p>
+<p>Always read a plan's Electricity Facts Label, terms of service and cancellation terms before switching. We aren't responsible for decisions made using this site.</p>
+<h2>Data and content</h2><p>Rate data comes from the U.S. Energy Information Administration and the Public Utility Commission of Texas and may be revised. Content may change without notice. The site's text, tools and illustrations are owned by {O_NAME}; you may quote short excerpts with a link to the source page.</p>
+<h2>Advertising and affiliate links</h2><p>The site is funded by advertising (Google AdSense) and may contain affiliate links. Advertisers and partners don't influence our content or calculations.</p>"""
+about=f"""<p>kWhCompare helps U.S. households answer a simple question: am I paying too much for electricity?</p>
 <p>We turn public data from the U.S. Energy Information Administration into plain-language rate comparisons for every state, and our free bill analyzer shows how your all-in rate compares with your state's average.</p>
-<p>We're independent. We don't sell electricity, and the estimates on this site aren't offers from any provider. Some plan links may be affiliate links, which help keep the site free.</p>
-<h2>Editorial standards</h2><p>Every figure on this site comes from a public, official source: the U.S. Energy Information Administration for state rates and bills, and the Public Utility Commission of Texas for Texas delivery charges and customer rules. Guides are written and reviewed by the kWhCompare editorial team, dated, and updated when the underlying data changes. Advertisers and partners have no say over what we publish or how plans are ranked.</p>
-<p>Found an error? Tell us at <strong>hello@kwhcompare.com</strong> and we'll correct it. Read more about <a href="/methodology/">our data and methodology</a>.</p>"""
-contact="""<p>Questions, corrections or partnership inquiries: <strong>hello@kwhcompare.com</strong></p><p>We read every message and usually reply within two business days.</p>"""
+<h2>Who runs kWhCompare</h2><p>kWhCompare is an independent project created and run by <strong>{O_NAME}</strong>, based in {O_PLACE}. We don't sell electricity, and the estimates on this site aren't offers from any provider. The site is funded by advertising and, in some cases, affiliate links, which help keep every tool free.</p>
+<h2>Editorial standards</h2><p>Every figure on this site comes from a public, official source: the U.S. Energy Information Administration for state rates and bills, and the Public Utility Commission of Texas for Texas delivery charges and customer rules. Each guide lists its sources, shows its date and is updated when the underlying data changes. Advertisers and partners have no say over what we publish or how plans are ranked.</p>
+<p>Found an error? Write to <a href="mailto:{O_EMAIL}">{O_EMAIL}</a> and we'll correct it. Read more about <a href="/methodology/">our data and methodology</a>.</p>"""
+contact=f"""<p>Questions, corrections or partnership inquiries: <a href="mailto:{O_EMAIL}"><strong>{O_EMAIL}</strong></a></p>
+<p>We read every message and usually reply within two business days.</p>
+<p class="hint">kWhCompare.com is owned and operated by {O_NAME}, {O_PLACE}. See the <a href="/legal-notice/">legal notice</a>.</p>"""
+legal=f"""<p>Last updated {LEGAL_UPDATED}.</p>
+<h2>Website owner</h2>
+<div class="scroll"><table><tbody>
+<tr><th>Owner</th><td>{O_NAME}</td></tr>
+{f'<tr><th>Address</th><td>{O_ADDR}</td></tr>' if O_ADDR else f'<tr><th>Location</th><td>{O_PLACE}</td></tr>'}
+{f'<tr><th>Tax ID (NIF)</th><td>{O_TAX}</td></tr>' if O_TAX else ''}
+<tr><th>Email</th><td><a href="mailto:{O_EMAIL}">{O_EMAIL}</a></td></tr>
+<tr><th>Website</th><td>kwhcompare.com</td></tr>
+</tbody></table></div>
+<h2>Purpose of the website</h2><p>kWhCompare.com is an information website about U.S. electricity rates and bills, with free calculators. It is funded by advertising (Google AdSense) and may contain affiliate links.</p>
+<h2>Liability</h2><p>Content is provided for general information. We work to keep it accurate and up to date, but we can't guarantee it is free of errors and aren't liable for decisions made on the basis of it. External links are provided for convenience; we aren't responsible for third-party content.</p>
+<h2>Intellectual property</h2><p>The texts, tools, illustrations and design of this website belong to {O_NAME}, unless otherwise stated. Rate data belongs to its official sources.</p>
+<h2>Privacy</h2><p>See our <a href="/privacy/">privacy policy</a> and <a href="/terms/">terms of use</a>.</p>"""
 METH="""<p>Last updated September 29, 2026.</p>
 <h2>State electricity rates</h2><p>State averages are residential revenue divided by residential kWh sold, from U.S. Energy Information Administration data for mid-2026. They include generation, delivery, fees and taxes. Average bills are the typical monthly residential bill in each state. National rank orders all 50 states plus Washington, D.C., from cheapest to most expensive.</p>
 <h2>Bill analyzer</h2><p>Your all-in rate is your total bill divided by kWh used. We compare it with your state average. In deregulated states, savings estimates assume the supply portion is roughly 55–60% of an all-in bill and that competitive fixed-rate plans typically undercut default supply prices by 10–20%. In regulated states we estimate savings from time-of-use rates, community solar and efficiency. All results are estimates, not offers.</p>
@@ -285,7 +313,8 @@ METH="""<p>Last updated September 29, 2026.</p>
 for p,t,d,b in [("/methodology/","Methodology and data sources","How kWhCompare calculates electricity rates, savings estimates and Texas plan costs.",METH),("/privacy/","Privacy policy","How kWhCompare handles your data, cookies and advertising.",priv),
                 ("/terms/","Terms of use","Terms of use for kWhCompare.",terms),
                 ("/about/","About kWhCompare","Who we are and where our electricity rate data comes from.",about),
-                ("/contact/","Contact","Contact kWhCompare.",contact)]:
+                ("/contact/","Contact","Contact kWhCompare.",contact),
+                ("/legal-notice/","Legal notice","Website owner, contact details and legal information for kWhCompare.com.",legal)]:
     write(p,simple(p,t,d,b)); paths.append(p)
 
 exec(open('tx.py').read())
@@ -593,7 +622,7 @@ for a in ARTICLES:
     path=f"/blog/{a['slug']}/"
     ld={"@context":"https://schema.org","@graph":[crumbs([("Home","/"),("Guides","/blog/"),(a['h1'],path)]),
         {"@type":"Article","headline":a['title'],"description":a['desc'],"datePublished":a['date'],"dateModified":a['date'],
-         "author":{"@type":"Organization","name":"kWhCompare Editorial Team","url":SITE+"/about/"},
+         "author":{"@type":"Organization","name":"kWhCompare","url":SITE+"/about/"},
          "publisher":{"@type":"Organization","name":"kWhCompare","url":SITE+"/"},"mainEntityOfPage":SITE+path,"inLanguage":"en-US"},
         {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":ans}} for q,ans in a['faq']]}]}
     # split body after the first h2 section to place a mid-article ad
@@ -610,7 +639,7 @@ for a in ARTICLES:
 <article class="content prose" style="border:0">
     <span class="kicker">{D.art_meta(a)[0]}</span>
     <h1 style="font-size:clamp(2rem,4.8vw,3.1rem)">{e(a['h1'][0].upper()+a['h1'][1:])}</h1>
-    <p class="hint" style="margin:0 0 1.2rem">By the kWhCompare Editorial Team · Updated {nice(a['date'])} · {a['mins']} min read</p>
+    <p class="hint" style="margin:0 0 1.2rem">By kWhCompare · Updated {nice(a['date'])} · {a['mins']} min read</p>
     <p class="lede" style="max-width:62ch">{a['lede']}</p>
     {D.figure(D.art_meta(a)[1],"article-photo",True)}
     {ad(1,"in_article",False)}

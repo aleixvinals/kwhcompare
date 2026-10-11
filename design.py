@@ -110,6 +110,11 @@ def make_header():
   </div>
 </header>'''
 
+try:
+    OWNER_NAME=(json.load(open('site.config.json',encoding='utf-8')).get('owner') or {}).get('name','')
+except Exception:
+    OWNER_NAME=''
+
 def make_footer(arts):
     g = "".join(f'<li><a href="/blog/{a["slug"]}/">{cap(a["h1"])}</a></li>' for a in arts[:5])
     return f'''<footer class="site-foot">
@@ -125,7 +130,7 @@ def make_footer(arts):
     <div><h3>Guides</h3><ul>{g}<li><a href="/blog/">All guides →</a></li></ul></div>
     <div><h3>Company</h3><ul>
       <li><a href="/about/">About</a></li><li><a href="/methodology/">How we calculate</a></li><li><a href="/contact/">Contact</a></li></ul>
-      <h3>Legal</h3><ul><li><a href="/privacy/">Privacy policy</a></li><li><a href="/terms/">Terms of use</a></li></ul></div>
+      <h3>Legal</h3><ul><li><a href="/privacy/">Privacy policy</a></li><li><a href="/terms/">Terms of use</a></li><li><a href="/legal-notice/">Legal notice</a></li></ul></div>
   </div>
-  <div class="wrap foot-legal"><p>Results are estimates for educational purposes and aren't financial advice or offers from any provider. Your utility bill is the final word on what you owe. Rate data: U.S. Energy Information Administration and Public Utility Commission of Texas. © 2026 kWhCompare.</p></div>
+  <div class="wrap foot-legal"><p>Results are estimates for educational purposes and aren't financial advice or offers from any provider. Your utility bill is the final word on what you owe. Rate data: U.S. Energy Information Administration and Public Utility Commission of Texas. © 2026 kWhCompare</p></div>
 </footer>'''
