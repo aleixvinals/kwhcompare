@@ -158,7 +158,7 @@ function drawTable() {
     .sort((a,b) => (a[sortKey] > b[sortKey] ? 1 : a[sortKey] < b[sortKey] ? -1 : 0) * sortDir);
   document.querySelector("#rate-table tbody").innerHTML = rows.map(s => `
     <tr>
-      <td><a href="/electricity-rates/${slug(s.name)}/">${s.name}</a></td>
+      <td>${CHOICE.has(s.code) ? `<a href="/electricity-rates/${slug(s.name)}/">${s.name}</a>` : s.name}</td>
       <td class="num"><span class="bar" style="width:${Math.round(s.rate / maxRate * 70)}px" aria-hidden="true"></span>${s.rate.toFixed(2)}</td>
       <td class="num">$${s.bill}</td>
       <td class="num">${s.yoy > 0 ? "+" : ""}${s.yoy.toFixed(1)}%</td>

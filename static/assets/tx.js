@@ -1,3 +1,4 @@
+(() => {
 const TDU = {
  cnp:{name:"CenterPoint Energy",fixed:4.99,kwh:4.972,prefix:["1008901"],digits:22,phone:"1-800-332-7143",slug:"centerpoint"},
  oncor:{name:"Oncor Electric Delivery",fixed:4.23,kwh:6.013,prefix:["1044372","1017699"],digits:17,phone:"1-888-313-4747",slug:"oncor"},
@@ -12,7 +13,9 @@ const delivery = (t, kwh) => t.fixed + t.kwh / 100 * kwh;
 /* ---------- True cost calculator (city pages) ---------- */
 const tc = $("tc");
 if (tc) {
-  const t = TDU[tc.dataset.tdu];
+  let t = TDU[tc.dataset.tdu];
+  const tduSel = $("tc-tdu");
+  if (tduSel) { t = TDU[tduSel.value] || t; tduSel.addEventListener("change", () => { t = TDU[tduSel.value]; run(); }); }
   const f = id => parseFloat($(id).value) || 0;
   function planCost(kwh) {
     const energy = f("tc-energy") / 100 * kwh, base = f("tc-base");
@@ -72,6 +75,8 @@ if (esiIn) {
   const cs = $("city-in");
   if (cs) cs.addEventListener("change", () => {
     const [k, url] = cs.value.split("|");
-    $("city-out").innerHTML = k ? `<p>Served by <b>${TDU[k].name}</b>. Your ESI ID should start with <b>${TDU[k].prefix.join("</b> or <b>")}</b>. <a href="${url}">See rates in this city</a>.</p>` : "";
+    $("city-out").innerHTML = k ? `<p>Served by <b>${TDU[k].name}</b>. Your ESI ID should start with <b>${TDU[k].prefix.join("</b> or <b>")}</b>. <a href="${url}">Calculate a plan's cost</a>.</p>` : "";
   });
 }
+
+})();

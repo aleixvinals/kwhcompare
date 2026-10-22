@@ -72,6 +72,14 @@ SEO
 - Link to 3-6 relevant pages from the INTERNAL PAGES list only, with descriptive anchor text. No external links.
 - End with a practical "what to do next" section.
 
+VALUE (this is what decides whether the page deserves to rank and carry ads)
+- Give the article one clear, specific angle that generic articles on the topic lack: a decision rule, a break-even calculation,
+  a comparison across states or utilities from the FACT PACK, or a step-by-step method the reader can apply to their own bill.
+- Include at least two worked examples with real arithmetic, using different situations (for example a small apartment and a large house).
+- Every section must add new, concrete information. No filler, no generic tips that would fit any energy article unless you quantify them.
+- Don't re-explain what an existing internal page already covers in depth; summarize in one or two sentences and link to it.
+- Write for a reader in the United States who will act on the advice this week.
+
 ACCURACY (critical)
 - Only use statistics from the FACT PACK or widely established facts (for example DOE thermostat guidance, basic physics).
 - If a figure isn't in the FACT PACK and you're not certain it's well established, describe it qualitatively or as a typical range with "about/typically".
@@ -191,6 +199,15 @@ Write the article now. Return only the JSON object."""
     print(f"Wrote {out} ({words(art['body'])} words): {art['title']}")
     with open(os.environ.get("GITHUB_OUTPUT", os.devnull), "a") as gh:
         gh.write(f"title={art['title']}\nslug={art['slug']}\n")
+    # Readable preview for the pull request (GitHub renders this HTML)
+    faq = "".join(f"<p><strong>{q}</strong><br>{a}</p>" for q, a in art["faq"])
+    src = "".join(f"<li>{s}</li>" for s in art["sources"])
+    preview = (f"**Review this article, then press _Merge pull request_ to publish it.** "
+               f"To reject it, press _Close pull request_.\n\n"
+               f"**Title (Google):** {art['title']}  \n**Description (Google):** {art['desc']}  \n"
+               f"**Words:** {words(art['body'])}  \n**URL:** https://kwhcompare.com/blog/{art['slug']}/\n\n---\n\n"
+               f"<h1>{art['h1']}</h1>\n<p><em>{art['lede']}</em></p>\n{art['body']}\n<h2>FAQ</h2>\n{faq}\n<h3>Sources</h3><ul>{src}</ul>")
+    open(os.environ.get("PR_BODY_FILE", "/tmp/pr_body.md"), "w", encoding="utf-8").write(preview[:60000])
 
 if __name__ == "__main__":
     main()

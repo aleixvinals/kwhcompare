@@ -120,33 +120,52 @@ def state_page(s):
     vs_txt=f"{abs(vs):.0f}% {'above' if vs>0 else 'below'} the national average of {US}¢"
     rk=s['rank']; rk_txt=f"{rk}{'th' if 10<rk%100<14 else {1:'st',2:'nd',3:'rd'}.get(rk%10,'th')}"
     trend=f"up {s['yoy']:.1f}%" if s['yoy']>0 else f"down {abs(s['yoy']):.1f}%"
-    reg=region[c]; peers=[x for x in S if region[x['code']]==reg and x['code']!=c]
+    reg=region[c]; peers=[x for x in S if x['code'] in CHOICE and x['code']!=c]
+    reg_peers=[x for x in S if region[x['code']]==reg and x['code']!=c]
     peers_sorted=sorted(peers,key=lambda x:x['rate'])
-    cheaper=[x for x in peers_sorted if x['rate']<s['rate']]
+    cheaper=sorted([x for x in reg_peers if x['rate']<s['rate']],key=lambda x:x['rate'])
+    from choice import CHOICE_INFO
+    ci=CHOICE_INFO.get(c,{})
+    supply_share=0.55
+    save_mo=s['bill']*supply_share*0.10
     if c=="TX":
         market=f"""<h2>Can you choose your electricity provider in Texas?</h2>
 <p>Yes, and in most of the state you have to. Homes served by Oncor, CenterPoint Energy, AEP Texas and TNMP pick a retail electric provider, while the utility keeps delivering power and handling outages. Cities with their own utilities, such as Austin Energy and San Antonio's CPS Energy, are not part of the competitive market.</p>
-<p>Your 17- or 22-digit ESI ID on the bill identifies your meter and utility. Texas plans are advertised at 500, 1,000 and 2,000 kWh, so compare the price at your real usage, and watch for bill credits that only apply above a certain usage. When your contract ends, many providers roll you onto a pricier month-to-month rate. You can cross-check offers on {OFFICIAL[c]}.</p>"""
-    elif c in CHOICE:
-        market=f"""<h2>Can you choose your electricity provider in {n}?</h2>
-<p>Yes. {n} has retail electricity choice. Your local utility keeps delivering power and handling outages, but you can buy the electricity itself from a competitive supplier. That supply charge is usually more than half of an all-in bill, so it's where switching pays off.</p>
-<p>If you've never shopped, you're likely on your utility's default rate, often shown on the bill as the "price to compare." Before switching, check whether the rate is fixed or variable, the contract length, any monthly fee and the early cancellation fee.{f' You can cross-check offers on {OFFICIAL[c]}.' if c in OFFICIAL else ''}</p>"""
-    elif c in LIMITED:
-        market=f"""<h2>Can you choose your electricity provider in {n}?</h2>
-<p>Only in a limited way. {n} allows retail choice for some customers or through capped programs, so most households stay with {U[c]}. Your biggest levers are the rate plans your utility offers, community solar where available, and cutting usage.</p>"""
+<p>{ci.get('note','')}</p>
+<p>Your 17- or 22-digit ESI ID on the bill identifies your meter and utility. Texas plans are advertised at 500, 1,000 and 2,000 kWh, so compare the price at your real usage, and watch for bill credits that only apply above a certain usage. When your contract ends, many providers roll you onto a pricier month-to-month rate. You can cross-check offers on {ci.get('site','')}.</p>"""
     else:
-        market=f"""<h2>Can you choose your electricity provider in {n}?</h2>
-<p>No. {n} is a regulated market: {U[c]} both deliver and sell your power, and rates are set by the state utility commission. You can't switch supplier, but you can change how you pay, for example with a time-of-use plan, budget billing or efficiency upgrades.</p>"""
+        agg=f"<h3>Community and municipal aggregation</h3><p>{ci['aggregation']}</p>" if ci.get('aggregation') else ""
+        market=f"""<h2>How electricity choice works in {n}</h2>
+<p>{n} lets households buy the electricity itself from a {ci.get('supplier','competitive supplier')}, while {U[c]} keep{'s' if ' and ' not in U[c] and ',' not in U[c] else ''} delivering power, reading meters and handling outages. The program is overseen by the {ci.get('regulator','state utility commission')}.</p>
+<p>If you've never shopped, you're on {ci.get('default','your utility default rate')}. {ci.get('note','')}</p>
+{agg}
+<h3>What switching could save in {n}</h3>
+<p>With a typical {n} bill of about ${s['bill']}, supply is roughly ${s['bill']*supply_share:.0f} of it. A supply price 10% below your current default rate would save about <strong>${save_mo:.0f} a month (${save_mo*12:.0f} a year)</strong>; delivery charges don't change.</p>
+<h3>How to switch in {n}</h3>
+<p>Have your {ci.get('id_name','account number')} ready, compare offers on {ci.get('site','the state commission website')}, and sign up with the supplier you choose. The supplier arranges the switch with your utility and your power isn't interrupted. Note when any fixed rate ends, because many suppliers then move you to a variable rate.</p>"""
+    from choice import HISTORY, UTILITIES
+    if c in UTILITIES:
+        urows="".join(f'<tr><td><strong>{u}</strong></td><td>{a}</td></tr>' for u,a in UTILITIES[c])
+        side=f"""<h2>Electric utilities in {n}</h2>
+      <p>Your utility delivers the power and stays the same whichever supplier you choose. Its name is at the top of your bill.</p>
+      <div class="scroll"><table><thead><tr><th>Utility</th><th>Main service area</th></tr></thead><tbody>{urows}</tbody></table></div>
+      <h2>A short history</h2><p>{HISTORY.get(c,'')} Today the {ci.get('regulator','state commission')} oversees the market.</p>"""
+    else:
+        side=f"""<h2>Main electric utilities in {n}</h2>
+      <p>Most {n} homes are served by {U[c]}. Your utility's name and account number are near the top of your bill.</p>
+      <h2>A short history</h2><p>{HISTORY.get(c,'')}</p>"""
     tips=[]
     if c in CHOICE: tips.append("<li><strong>Compare fixed-rate supply plans.</strong> Households on the default rate often save 10–20% on the supply portion.</li>")
     tips.append("<li><strong>Ask your utility about time-of-use pricing.</strong> Shifting laundry, dishwashing and EV charging to off-peak hours can cut 5–15%.</li>")
     if c in CS: tips.append(f"<li><strong>Look at community solar.</strong> {n} has community solar programs that credit your bill for a share of a local solar farm, often 5–15% savings with no rooftop panels.</li>")
     tips.append("<li><strong>Tackle heating and cooling first.</strong> A smart thermostat and sealed air leaks usually save more than any other single change.</li>")
     tips.append("<li><strong>Check for assistance programs.</strong> LIHEAP and utility discount programs can lower bills for eligible households.</li>")
-    faq=[(f"What is the average electricity rate in {n}?",f"The average residential rate in {n} is {s['rate']:.2f} cents per kWh as of {UPDATED}, {vs_txt}."),
-         (f"What is the average electric bill in {n}?",f"About ${s['bill']} per month, based on average use of roughly {kwh:,} kWh."),
-         (f"Can I switch electricity providers in {n}?",("Yes. "+n+" has retail electricity choice, so you can pick a competitive supplier while your utility keeps delivering power.") if c in CHOICE else ("Only in a limited way; most households stay with their utility." if c in LIMITED else f"No. {n} is regulated, so your utility sells and delivers your power.")),
-         (f"Who are the main electric utilities in {n}?",f"The main utilities in {n} are {U[c]}.")]
+    faq=[(f"What is the average electricity rate in {n}?",f"The average residential rate in {n} is {s['rate']:.2f} cents per kWh as of {UPDATED}, {vs_txt}, and about ${s['bill']} a month for a typical home.")]
+    if ci.get('default'):
+        faq.append((f"What is the default electricity rate in {n} called?",f"If you haven't chosen a supplier, you're on {ci['default']}. It's the price any supplier offer needs to beat."))
+    faq.append((f"Who regulates electricity suppliers in {n}?",f"The {ci.get('regulator','state utility commission')}. You can compare offers on {ci.get('site','its website')}."))
+    if ci.get('aggregation'):
+        faq.append((f"Does {n} have municipal or community aggregation?",ci['aggregation']))
     ld={"@context":"https://schema.org","@graph":[crumbs([("Home","/"),("Electricity rates","/#rates"),(n,path)]),
         {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in faq]}]}
     title=f"{n} Electricity Rates ({UPDATED}): {s['rate']:.2f}¢/kWh Average | kWhCompare"
@@ -183,19 +202,14 @@ def state_page(s):
       <div><dt>Avg usage</dt><dd>{kwh:,} kWh</dd></div>
       <div><dt>National rank</dt><dd>{rk_txt}</dd></div>
     </dl>
-    <p>To find your own rate, divide your total bill by the kWh you used. If you paid ${s['bill']} for {kwh:,} kWh, you're right at the {n} average.</p>
   </div>
 </section>
 {ad(1)}
 <section class="content">
   <div class="wrap two-col">
     <div class="prose">{market}
-      <h2>Main electric utilities in {n}</h2>
-      <p>Most {n} homes are served by {U[c]}. Your utility's name and account number are near the top of your bill.</p>
     </div>
-    <div class="prose">
-      <h2>How to lower your electric bill in {n}</h2>
-      <ul>{''.join(tips)}</ul>
+    <div class="prose">{side}
     </div>
   </div>
 </section>
@@ -208,9 +222,9 @@ def state_page(s):
 </section>
 <section class="content">
   <div class="wrap">
-    <h2>Compare other {reg} states</h2>
+    <h2>Other states where you can choose your supplier</h2>
     <ul class="state-links">{links}</ul>
-    <p class="disclaimer">Averages are EIA residential revenue divided by kWh sold, {UPDATED}. Your rate depends on your utility, plan and season. <a href="/#rates">See all 50 states</a>.</p>
+    <p class="disclaimer">Averages are EIA residential revenue divided by kWh sold, {UPDATED}. Your rate depends on your utility, plan and season. <a href="/#rates">See average rates for all 50 states</a>.</p>
   </div>
 </section>
 </main>
@@ -234,7 +248,16 @@ import hashlib
 def _ver(f):
     return hashlib.md5(open(f,'rb').read()).hexdigest()[:10]
 ASSET_V={a:_ver('static/assets/'+a) for a in ('site.css','app.js','tx.js')}
+REDIRECTS={}
+def _init_redirects():
+    from tx import CITIES as _C
+    for c,_,_ in _C: REDIRECTS[f"/electricity-rates/texas/{slug(c)}/"]="/electricity-rates/texas/"
+    for s_ in S:
+        if s_['code'] not in CHOICE: REDIRECTS[f"/electricity-rates/{slug(s_['name'])}/"]="/"
+_init_redirects()
 def write(path,content):
+    for old,new in REDIRECTS.items():
+        content=content.replace(f'href="{old}"',f'href="{new}#texas-cities"' if new.endswith('/texas/') else f'href="/#rates"')
     for a,v in ASSET_V.items():
         content=content.replace(f'/assets/{a}"',f'/assets/{a}?v={v}"')
     if AD_LOADER and '</body>' in content: content=content.replace('</body>',AD_LOADER+'\n</body>',1)
@@ -242,8 +265,10 @@ def write(path,content):
     os.makedirs(os.path.dirname(p),exist_ok=True); open(p,'w').write(content)
 
 paths=["/"]
+KEEP=set(CHOICE)
 for s in S:
-    p,c=state_page(s); write(p,c); paths.append(p)
+    if s['code'] in KEEP:
+        p,c=state_page(s); write(p,c); paths.append(p)
 
 # Home page from the original, with external assets
 home=src
@@ -320,6 +345,7 @@ for p,t,d,b in [("/methodology/","Methodology and data sources","How kWhCompare 
 exec(open('tx.py').read())
 open('site/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
   "\n".join(f'  <url><loc>{SITE}{p}</loc><lastmod>{ISO}</lastmod></url>' for p in paths)+'\n</urlset>\n')
+open('site/_redirects','w').write(''.join(f'{o} {n} 301\n{o.rstrip("/")} {n} 301\n' for o,n in REDIRECTS.items()))
 open('site/robots.txt','w').write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
 open('site/ads.txt','w').write(f"google.com, {AD_CLIENT.replace('ca-','')}, DIRECT, f08c47fec0942fa0\n" if ADS_ON else "# Add your AdSense publisher ID in site.config.json and this file fills itself in.\n")
 open('site/404.html','w').write(simple("/404/","Page not found","Page not found.",'<p>That page doesn\'t exist. <a href="/">Compare your electricity rate</a> or <a href="/#rates">browse rates by state</a>.</p>').replace('index, follow','noindex'))
@@ -449,8 +475,6 @@ def city_page(city,k,clim):
 </body>
 </html>'''
 
-for c,k,cl in CITIES:
-    p,h=city_page(c,k,cl); write(p,h); paths.append(p)
 
 # ESI ID lookup page
 esi_path="/esi-id-lookup/"
@@ -461,7 +485,7 @@ esi_faq=[("What is an ESI ID?","An Electric Service Identifier is the unique num
 ld={"@context":"https://schema.org","@graph":[crumbs([("Home","/"),("ESI ID lookup",esi_path)]),
   {"@type":"WebApplication","name":"Texas ESI ID Decoder","url":SITE+esi_path,"applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},
   {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in esi_faq]}]}
-opts="".join(f'<option value="{k}|{city_url(c)}">{c}</option>' for c,k,_ in sorted(CITIES))
+opts="".join(f'<option value="{k}|/electricity-rates/texas/#texas-cities">{c}</option>' for c,k,_ in sorted(CITIES))
 prefix_rows="".join(f'<tr><td>{t["name"]}</td><td>{" or ".join(t["prefix"])}</td><td class="num">{t["digits"]}</td><td>{t["phone"]}</td></tr>' for t in TDU.values())
 esi=head("Texas ESI ID Lookup: Find & Decode Your ESI ID (2026) | kWhCompare",
  "Decode any Texas ESI ID instantly: see your utility (Oncor, CenterPoint, AEP, TNMP), delivery charges and outage number. Learn where to find your ESI ID.",esi_path,ld)+f'''
@@ -532,7 +556,7 @@ tdu_path="/texas/tdu-delivery-charges/"
 cities_by={k:[c for c,kk,_ in CITIES if kk==k] for k in TDU}
 tdu_sections=""
 for k,t in TDU.items():
-    cl=", ".join('<a href="%s">%s</a>'%(city_url(c),c) for c in cities_by[k])
+    cl=", ".join(cities_by[k])
     tdu_sections+='<div class="prose" style="margin-bottom:1.5rem"><h3 style="margin:0 0 .3rem">%s</h3><p style="margin:0">Serves %s. Outages: %s. Cities: %s.</p></div>'%(t["name"],t["area"],t["phone"],cl)
 tfaq=[("What are TDU delivery charges?","Fees your local transmission and distribution utility charges to deliver power to your home. They're set by the Public Utility Commission of Texas and are the same with every provider."),
       ("When do Texas delivery charges change?","Scheduled updates happen on March 1 and September 1 each year, and utilities can also change rates after a rate case."),
@@ -558,7 +582,7 @@ tdu=head("Texas TDU Delivery Charges (2026): Oncor, CenterPoint, AEP, TNMP | kWh
   <div class="wrap">
     <h2>Which utility serves your city</h2>
     {tdu_sections}
-    <p><a href="/esi-id-lookup/">Not sure? Decode your ESI ID</a></p>
+    <p><a href="/electricity-rates/texas/#texas-cities">Calculate a plan's cost for your city</a> or <a href="/esi-id-lookup/">decode your ESI ID</a>.</p>
   </div>
 </section>
 <section class="content">
@@ -575,23 +599,41 @@ write(tdu_path,tdu); paths.append(tdu_path)
 
 # Add Texas city hub section to the Texas state page
 tp='site/electricity-rates/texas/index.html'; th=open(tp).read()
-hub_lists=""
-for k in TDU:
-    hub_lists+='<h3 style="margin:1.2rem 0 .5rem;font-size:1rem">%s</h3><ul class="state-links">%s</ul>'%(TDU[k]["name"],"".join('<li><a href="%s">%s</a></li>'%(city_url(c),c) for c in cities_by[k]))
+city_rows="".join('<tr><td>%s</td><td>%s</td><td class="num">$%.2f</td></tr>'%(c,TDU[k]["short"],deliv(TDU[k],1000)) for c,k,_ in sorted(CITIES))
+tdu_opts="".join('<option value="%s"%s>%s</option>'%(k," selected" if k=="oncor" else "",t["name"]) for k,t in sorted(TDU.items(),key=lambda kv:kv[1]["name"]))
 hub=f'''<section class="content" id="texas-cities">
   <div class="wrap">
-    <h2>Electricity rates in Texas cities</h2>
-    <p class="prose">Delivery charges depend on which utility serves your city. Pick your city to calculate a plan's true cost, or <a href="/esi-id-lookup/">decode your ESI ID</a> and <a href="/texas/tdu-delivery-charges/">compare delivery charges</a>.</p>
-    {hub_lists}
+    <h2>Texas cities and plan cost calculator</h2>
+    <p class="prose">In competitive Texas, your city decides which utility delivers your power, and that utility's delivery charge is added to every plan. Find your city below, then use the calculator to see what any plan really costs at your usage.</p>
+    <div class="two-col">
+      <div class="scroll" style="max-height:520px;overflow:auto"><table><thead><tr><th>City</th><th>Utility (TDU)</th><th class="num">Delivery at 1,000 kWh</th></tr></thead><tbody>{city_rows}</tbody></table></div>
+      <div class="tool" id="tc" data-tdu="oncor">
+        <div class="panel">
+          <p style="margin:0 0 1rem;font-weight:700">What will a plan really cost?</p>
+          <div class="field"><label for="tc-tdu">Your utility</label><select id="tc-tdu">{tdu_opts}</select></div>
+          <div class="grid2">
+            <div class="field"><label for="tc-kwh">Your monthly usage <span class="hint">(kWh)</span></label><input id="tc-kwh" type="number" inputmode="numeric" value="1000" min="1"></div>
+            <div class="field"><label for="tc-energy">Plan energy charge <span class="hint">(¢/kWh)</span></label><input id="tc-energy" type="number" inputmode="decimal" value="9.5" step="0.1" min="0"></div>
+            <div class="field"><label for="tc-base">Provider base fee <span class="hint">($/mo)</span></label><input id="tc-base" type="number" inputmode="decimal" value="0" step="0.01" min="0"></div>
+            <div class="field"><label for="tc-credit">Bill credit <span class="hint">($, if any)</span></label><input id="tc-credit" type="number" inputmode="decimal" value="0" step="1" min="0"></div>
+          </div>
+          <div class="field"><label for="tc-credit-min">Credit applies at or above <span class="hint">(kWh)</span></label><input id="tc-credit-min" type="number" inputmode="numeric" value="1000" min="0"></div>
+          <p class="hint" style="margin:0">Find the energy charge, base fee and bill credit on the plan's Electricity Facts Label (EFL).</p>
+        </div>
+        <div id="tc-out" style="border-top:1px solid var(--line);padding:1.25rem" aria-live="polite"></div>
+      </div>
+    </div>
+    <p class="disclaimer">Delivery charges from the Public Utility Commission of Texas rate summary, late summer 2026. <a href="/texas/tdu-delivery-charges/">See full delivery charges</a> or <a href="/esi-id-lookup/">decode your ESI ID</a>.</p>
   </div>
 </section>
 '''
 th=th.replace('<section class="content">\n  <div class="wrap">\n    <h2>Texas electricity FAQ</h2>',hub+'<section class="content">\n  <div class="wrap">\n    <h2>Texas electricity FAQ</h2>')
+th=th.replace('</body>','<script src="/assets/tx.js" defer></script>\n</body>',1)
 open(tp,'w').write(th)
 
 # Home: link Texas tools
 hp='site/index.html'; hh=open(hp).read()
-hh=hh.replace('<section class="content" id="how">','''<section class="content" id="texas"><div class="wrap two-col"><div class="prose"><h2>Shopping for power in Texas?</h2><p>Most Texans pick their own provider. Find your city to see your delivery charges and calculate a plan's true all-in price, or decode your ESI ID to see which utility serves you.</p></div><div><ul class="state-links"><li><a href="/esi-id-lookup/">ESI ID lookup</a></li><li><a href="/texas/tdu-delivery-charges/">TDU delivery charges</a></li><li><a href="/electricity-rates/texas/houston/">Houston</a></li><li><a href="/electricity-rates/texas/dallas/">Dallas</a></li><li><a href="/electricity-rates/texas/fort-worth/">Fort Worth</a></li><li><a href="/electricity-rates/texas/corpus-christi/">Corpus Christi</a></li><li><a href="/electricity-rates/texas/#texas-cities">All Texas cities</a></li></ul></div></div></section>
+hh=hh.replace('<section class="content" id="how">','''<section class="content" id="texas"><div class="wrap two-col"><div class="prose"><h2>Shopping for power in Texas?</h2><p>Most Texans pick their own provider. Find your city to see your delivery charges and calculate a plan's true all-in price, or decode your ESI ID to see which utility serves you.</p></div><div><ul class="state-links"><li><a href="/esi-id-lookup/">ESI ID lookup</a></li><li><a href="/texas/tdu-delivery-charges/">TDU delivery charges</a></li><li><a href="/electricity-rates/texas/#texas-cities">Texas plan calculator</a></li><li><a href="/electricity-rates/texas/">Texas electricity rates</a></li></ul></div></div></section>
 <section class="content" id="how">''',1)
 open(hp,'w').write(hh)
 
@@ -733,7 +775,7 @@ bars="".join(f'''<a href="/electricity-rates/{slug(s['name'])}/"><text x="0" y="
 <rect x="150" y="{i*40+9}" width="{s['yoy']/mx*330:.0f}" height="20" rx="4" class="bar-r"/>
 <text x="{150+s['yoy']/mx*330+8:.0f}" y="{i*40+24}" class="bv">+{s['yoy']:.1f}%</text></a>''' for i,s in enumerate(risers))
 chart=f'<svg viewBox="0 0 540 {len(risers)*40}" class="chart" role="img" aria-label="States with the biggest 12-month electricity price increases: '+", ".join(f"{s['name']} {s['yoy']:.1f}%" for s in risers)+f'">{bars}</svg>'
-tx_links="".join(f'<li><a href="{u}">{t}</a></li>' for t,u in [("Houston","/electricity-rates/texas/houston/"),("Dallas","/electricity-rates/texas/dallas/"),("Fort Worth","/electricity-rates/texas/fort-worth/"),("Corpus Christi","/electricity-rates/texas/corpus-christi/"),("Midland","/electricity-rates/texas/midland/"),("All 37 cities","/electricity-rates/texas/#texas-cities")])
+tx_links="".join(f'<li><a href="{u}">{t}</a></li>' for t,u in [("Texas plan calculator","/electricity-rates/texas/#texas-cities"),("Texas electricity rates","/electricity-rates/texas/"),("TDU delivery charges","/texas/tdu-delivery-charges/"),("ESI ID lookup","/esi-id-lookup/")])
 TRUST=[("doc","Official sources","Every rate comes from the U.S. EIA or the Public Utility Commission of Texas, with the date shown."),
  ("calc","Math in the open","Our methodology page shows exactly how every estimate is calculated."),
  ("lock","Nothing stored","The numbers you type are calculated on your device and never sent to us."),
