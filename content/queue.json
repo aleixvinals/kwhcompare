@@ -83,7 +83,9 @@
   "keyword": "time of use electricity rates",
   "title": "Time-of-Use Electricity Rates Explained",
   "angle": "Peak vs off-peak pricing, who benefits, how to shift load, worked example of savings, regulated utilities vs Texas retail TOU plans.",
-  "status": "pending"
+  "status": "done",
+  "published": "2026-11-17",
+  "slug": "time-of-use-electricity-rates-explained"
  },
  {
   "keyword": "budget billing electricity",
